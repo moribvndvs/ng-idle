@@ -1,0 +1,30 @@
+{
+  "name": "ng-idle",
+  "version": "0.1.0",
+  "description": "Directives and services for responding to idle users in AngularJS",
+  "scripts": {
+    "test": "grunt test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/HackedByChinese/ng-idle.git"
+  },
+  "author": "Mike Grabski <me@mikegrabski.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/HackedByChinese/ng-idle/issues"
+  },
+  "devDependencies": {
+  	"grunt": "~0.4.1",
+    "grunt-contrib-jshint": "~0.6.3",
+    "grunt-contrib-nodeunit": "~0.2.0",
+    "grunt-contrib-uglify": "~0.2.2",
+    "grunt-karma": "~0.7.0",
+    "matchdep": "~0.1.2",
+    "karma": "~0.10",
+    "karma-jasmine": "*",
+    "karma-chrome-launcher": "*",
+    "karma-firefox-launcher": "*",
+    "karma-ng-html2js-preprocessor": "*"
+  }
+}
