@@ -1,0 +1,27 @@
+{
+  "name": "ng-idle",
+  "version": "0.1.0",
+  "homepage": "https://github.com/HackedByChinese/ng-idle",
+  "description": "Directives and services for handling idle users in AngularJS",
+  "main": "src/angular-idle.js",
+  "keywords": [
+    "angularjs",
+    "idle",
+    "ng-idle"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular": "~1.2.1"
+  },
+  "devDependencies": {
+    "angular-mocks": "~1.2.1",
+    "jquery": "~2.0.3"
+  }
+}

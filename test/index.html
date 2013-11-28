@@ -1,0 +1,57 @@
+<html ng-app="demo">
+	<head>
+		<script src="../bower_components/angular/angular.js"></script>
+		<script src="../src/angular-idle.js"></script>
+		<script type="text/javascript">
+			var app = angular.module('demo', ['ngIdle']);
+			app
+			.controller('EventsCtrl', function($scope, $idle) {
+				$scope.events = [];
+
+				$scope.$on('$idleStart', function() {
+					$scope.events.push({event: '$idleStart', date: new Date()});					
+				});
+
+				$scope.$on('$idleEnd', function() {
+					// not sure why we need $apply here but not the others
+					$scope.$apply(function() {
+						$scope.events.push({event: '$idleEnd', date: new Date()});
+					});
+					
+				});
+
+				$scope.$on('$idleWarn', function(e, countdown) {
+					$scope.events.push({event: '$idleWarn', date: new Date(), countdown: countdown});
+				});
+
+				$scope.$on('$idleTimeout', function() {
+					$scope.events.push({event: '$idleTimeout', date: new Date()});
+				})
+			})
+			.config(function($idleProvider) {
+				$idleProvider.idleDuration(5);
+				$idleProvider.warningDuration(5);
+			})
+			.run(function($rootScope, $idle, $log){
+				$rootScope.$on('$idleStart', function() {
+					$log.debug('$idleStart');
+				});
+				$rootScope.$on('$idleEnd', function() {
+					$log.debug('$idleEnd');
+				});
+
+				$idle.watch();
+
+				$log.debug('app started.');
+			});
+		</script>
+	</head>
+	<body>
+		<div ng-controller="EventsCtrl">
+			<h1>$idle events</h1>
+			<ul>
+				<li ng-repeat="event in events">{{event}}</li>
+			</ul>
+		</div>
+	</body>
+</html>
