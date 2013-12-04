@@ -8,8 +8,82 @@
     'use strict';
 
     // register modules
-    var ngIdleSvc = angular.module('ngIdle.services', []);
-    angular.module('ngIdle', ['ngIdle.services']);
+    var idleNs = angular.module('ngIdle.idle', []);
+    var keepaliveNs = angular.module('ngIdle.keepalive', [])
+    angular.module('ngIdle', ['ngIdle.keepalive', 'ngIdle.idle']);
+
+    // $keepalive service and provider
+    function $KeepaliveProvider() {
+    	var options = {
+    		httpOptions: null,
+    		interval: 10*50,
+    		timeout: 0
+    	};
+
+    	this.httpOptions = httpOptions;
+    	function httpOptions(value) {
+    		if (angular.isString(value)) {
+    			value = {url: value, method: 'GET'};
+    		}
+
+    		value['cache'] = false;
+
+    		options.http = value;
+    	}
+
+    	this.interval = interval;
+    	function interval(seconds) {
+    		seconds = parseInt(seconds);
+
+    		if (isNaN(seconds) || seconds <= 0) throw new Error('Interval must be expressed in seconds and be greater than 0.');
+    		options.interval = seconds;
+    	}
+
+    	this.$get = $get;
+    	$get.inject = ['$rootScope', '$log', '$timeout', '$http'];
+
+    	function $get($rootScope, $log, $timeout, $http) {
+    		
+    		var state = {ping: null};
+
+
+    		function handleResponse(data, status) {
+    			$rootScope.$broadcast('$keepaliveResponse', data, status);
+
+    			schedulePing();
+    		}
+
+    		function schedulePing() {
+    			state.ping = $timeout(ping, options.interval * 1000);
+    		}
+
+    		function ping() {
+    			$rootScope.$broadcast('$keepalive');
+
+    			if (angular.isObject(options.http)) {
+    			 	$http(options.http)
+    			 		.success(handleResponse)
+    			 		.error(handleResponse);
+    			} else schedulePing();
+    		};
+
+    		return {
+    			_options: function() {
+    				return options;
+    			},
+    			start: function() {
+    				$timeout.cancel(state.ping);
+
+    				schedulePing();
+    			},
+    			stop: function() {
+    				$timeout.cancel(state.ping);
+    			}
+    		};
+    	}
+    }
+
+    keepaliveNs.provider('$keepalive', $KeepaliveProvider);
 
     // $idle service and provider
     function $IdleProvider() {
@@ -79,9 +153,6 @@
                 _options: function() {
                     return options;
                 },
-                _t: function() {
-                	return state.t;
-                },
                 running: function() {
                 	return state.running;
                 },
@@ -117,6 +188,6 @@
         };
     }
 
-    ngIdleSvc.provider('$idle', $IdleProvider);
+    idleNs.provider('$idle', $IdleProvider);
     
 })(window, window.angular);

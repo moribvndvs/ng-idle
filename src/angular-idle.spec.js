@@ -2,11 +2,19 @@
 
 describe('ngIdle', function() {
     // helpers
+    beforeEach(function () {
+        this.addMatchers({
+            toEqualData: function (expected) {
+                return angular.equals(this.actual, expected);
+            }
+        });
+    });
 
-    describe('services:', function() {
-        beforeEach(module('ngIdle.services'));
+    describe('idle', function() {
+		var $idleProvider, $timeout, $rootScope, $log, $document;
 
-        var $idleProvider, $timeout, $rootScope, $log, $document;;
+		beforeEach(module('ngIdle.idle'));
+
 
         beforeEach(function() {
             angular.module('app', function() {
@@ -163,6 +171,139 @@ describe('ngIdle', function() {
 
 			// 	expect($idle.idling()).toBe(false);
 			// });
+		});
+    });
+
+
+    describe('keepalive', function() {
+    	var $keepaliveProvider, $rootScope, $log, $httpBackend, $timeout, $http;
+
+    	beforeEach(module('ngIdle.keepalive'));
+
+    	beforeEach(function() {
+            angular
+            	.module('app', function() { })
+           		.config(['$keepaliveProvider', function(_$keepaliveProvider_) {
+                	$keepaliveProvider = _$keepaliveProvider_;
+            	}]);
+
+            module('app');
+            
+            inject(function (_$rootScope_, _$log_, _$httpBackend_, _$timeout_, _$http_) { 
+            	$rootScope = _$rootScope_;
+            	$log = _$log_;
+            	$httpBackend = _$httpBackend_;
+            	$timeout = _$timeout_;
+            	$http = _$http_;
+            });
+        });
+
+        var create = function(httpOptions) {
+        	if (httpOptions) $keepaliveProvider.httpOptions(httpOptions);
+        	return $keepaliveProvider.$get($rootScope, $log, $timeout, $http);
+        };
+
+        describe('$keepaliveProvider', function() {
+        	it ('httpOptions() should update options with simple GET', function() {
+            	$keepaliveProvider.httpOptions('/path/to/keepalive');
+
+            	expect(create()._options().http).toEqualData({url: '/path/to/keepalive', method: 'GET', cache: false});
+            });
+
+            it ('httpOptions() should update options with http options object', function() {
+            	$keepaliveProvider.httpOptions({url: '/path/to/keepalive', method: 'POST', cache: true});
+
+            	expect(create()._options().http).toEqualData({url: '/path/to/keepalive', method: 'POST', cache: false});
+            });
+
+            it ('interval() should update options', function() {
+            	$keepaliveProvider.interval(10);
+
+            	expect(create()._options().interval).toBe(10);
+            });
+
+            it ('interval() should throw if nan or less than or equal to 0', function() {
+
+            	expect(function() {
+            		$keepaliveProvider.interval('asdsad')
+            	}).toThrow(new Error('Interval must be expressed in seconds and be greater than 0.'));
+
+            	expect(function() {
+            		$keepaliveProvider.interval(0)
+            	}).toThrow(new Error('Interval must be expressed in seconds and be greater than 0.'));
+
+            	expect(function() {
+            		$keepaliveProvider.interval(-1)
+            	}).toThrow(new Error('Interval must be expressed in seconds and be greater than 0.'));
+            });
+        });
+
+		describe('$keepalive', function() {
+			var $keepalive;
+
+			beforeEach(function() {
+				$keepalive = create();
+			});
+
+			afterEach(function() {
+				$httpBackend.verifyNoOutstandingExpectation();
+        		$httpBackend.verifyNoOutstandingRequest();
+			});
+
+			it('start() should schedule ping timeout that broadcasts $keepalive event when it expires.', function() {
+				spyOn($rootScope, '$broadcast');
+
+				$keepalive.start();
+
+				$timeout.flush();
+
+				expect($rootScope.$broadcast).toHaveBeenCalledWith('$keepalive');
+			});
+
+			it ('stop() should cancel ping timeout.', function() {
+				spyOn($rootScope, '$broadcast');
+
+				$keepalive.start();
+				$keepalive.stop();
+
+				$timeout.verifyNoPendingTasks();
+
+				expect($rootScope.$broadcast).not.toHaveBeenCalledWith('$keepalive');
+			});
+
+			it ('should invoke a URL when pinged and broadcast $keepaliveResponse on success.', function() {
+				spyOn($rootScope, '$broadcast');
+
+				$keepalive = create('/path/to/keepalive');
+
+				$keepalive.start();
+
+				$httpBackend.expectGET('/path/to/keepalive')
+					.respond(200);
+				
+				$timeout.flush();
+
+				$httpBackend.flush();
+
+				expect($rootScope.$broadcast).toHaveBeenCalledWith('$keepaliveResponse', undefined, 200);
+			});
+
+			it ('should invoke a URL when pinged and broadcast $keepaliveResponse on error.', function() {
+				spyOn($rootScope, '$broadcast');
+
+				$keepalive = create('/path/to/keepalive');
+
+				$keepalive.start();
+
+				$httpBackend.expectGET('/path/to/keepalive')
+					.respond(404);
+				
+				$timeout.flush();
+
+				$httpBackend.flush();
+
+				expect($rootScope.$broadcast).toHaveBeenCalledWith('$keepaliveResponse', undefined, 404);
+			});
 		});
     });
 });

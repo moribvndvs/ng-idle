@@ -58,9 +58,12 @@ First, you'll need AngularJS 1.2.1 or later (earlier possible, but not tested ye
 
 You can stop watching for idleness at any time by calling `$idle.unwatch()`.
 
+Also available is the `$keepalive` service. It will run on a configurable interval to perform some keepalive task, broadcasting a `$keepalive` event on the `$rootScope`. Usually, this would be to make a request to a URL to keep the user's session alive. Therefore, `$keepalive` has the option to make the request for you during a keepalive. 
+
 ## Roadmap
 
-* **0.1**: The basic `$idle` service and `$idleProvider`.
+* **0.1**: Add the basic `$idle` service and `$idleProvider`.
+* **0.2**: Add the `$keepalive` service and `$keepaliveProvider`.
 
 TBD
 
