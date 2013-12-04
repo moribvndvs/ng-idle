@@ -11,7 +11,7 @@ describe('ngIdle', function() {
     });
 
     describe('idle', function() {
-		var $idleProvider, $timeout, $rootScope, $log, $document;
+		var $idleProvider, $timeout, $rootScope, $log, $document, $keepalive;
 
 		beforeEach(module('ngIdle.idle'));
 
@@ -30,10 +30,21 @@ describe('ngIdle', function() {
 				$log = _$log_;
 				$document = _$document_;
             });
+
+            $keepalive = {
+				start: function() {},
+				stop: function() {},
+				ping: function() {}
+			};
+
+			spyOn($keepalive, 'start');
+			spyOn($keepalive, 'stop');
+			spyOn($keepalive, 'ping');
         });
 
-        var create = function() {
-        	return $idleProvider.$get($timeout, $log, $rootScope, $document);
+        var create = function(keepalive) {
+        	if (angular.isDefined(keepalive)) $idleProvider.keepalive(keepalive);
+        	return $idleProvider.$get($timeout, $log, $rootScope, $document, $keepalive);
         };
 
         describe('$idleProvider', function() {
@@ -69,6 +80,12 @@ describe('ngIdle', function() {
 
                 expect(create()._options().autoResume).toBe(false);
             });
+
+            it ('keepalive() should update defaults', function() {
+            	$idleProvider.keepalive(false);
+
+            	expect(create()._options().keepalive).toBe(false);
+            });
         });
 
 		describe('$idle', function() {
@@ -90,7 +107,36 @@ describe('ngIdle', function() {
 
 				expect($timeout.cancel).toHaveBeenCalled();
 				expect($idle.running()).toBe(true);
+				expect($keepalive.start).toHaveBeenCalled();
 			});
+
+			it ('watch() should not start keepalive if disabled', function() {
+				$idle = create(false);
+
+				$idle.watch();
+				expect($keepalive.start).not.toHaveBeenCalled();
+			});
+
+			it ('should not stop keepalive when idle', function() {
+				$idle = create(false);
+
+				$idle.watch();
+
+				$timeout.flush();
+
+				expect($keepalive.stop).not.toHaveBeenCalled();
+			});
+
+			it ('should not start or ping keepalive when returning from idle', function() {
+				$idle = create(false);
+
+				$idle.watch();
+				$timeout.flush();
+				$idle.watch();
+
+				expect($keepalive.ping).not.toHaveBeenCalled();
+				expect($keepalive.start).not.toHaveBeenCalled();
+			})
 
 			it ('unwatch() should clear timeouts and stop running', function() {
 				$idle.watch();
@@ -103,7 +149,7 @@ describe('ngIdle', function() {
 				expect($idle.running()).toBe(false);
 			});
 
-			it ('should broadcast $idleStart', function() {				
+			it ('should broadcast $idleStart and stop keepalive', function() {				
 				spyOn($rootScope, '$broadcast');
 
 				$idle.watch();
@@ -111,9 +157,10 @@ describe('ngIdle', function() {
 				$timeout.flush();
 
 				expect($rootScope.$broadcast).toHaveBeenCalledWith('$idleStart');
+				expect($keepalive.stop).toHaveBeenCalled();
 			});
 
-			it ('should broadcast $idleEnd', function() {				
+			it ('should broadcast $idleEnd, start keepalive and ping', function() {				
 				spyOn($rootScope, '$broadcast');
 
 				$idle.watch();
@@ -123,6 +170,8 @@ describe('ngIdle', function() {
 				$idle.watch();
 
 				expect($rootScope.$broadcast).toHaveBeenCalledWith('$idleEnd');
+				expect($keepalive.ping).toHaveBeenCalled();
+				expect($keepalive.start).toHaveBeenCalled();
 			});
 
 			it ('should count down warning and then signal timeout', function() {
@@ -270,6 +319,16 @@ describe('ngIdle', function() {
 
 				expect($rootScope.$broadcast).not.toHaveBeenCalledWith('$keepalive');
 			});
+
+			it ('ping() should immediately broadcast $keepalive event', function() {
+				spyOn($rootScope, '$broadcast');
+
+				$keepalive.ping();
+
+				$timeout.verifyNoPendingTasks();
+
+				expect($rootScope.$broadcast).toHaveBeenCalledWith('$keepalive');
+			})
 
 			it ('should invoke a URL when pinged and broadcast $keepaliveResponse on success.', function() {
 				spyOn($rootScope, '$broadcast');
