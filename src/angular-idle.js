@@ -16,8 +16,7 @@
     function $KeepaliveProvider() {
     	var options = {
     		httpOptions: null,
-    		interval: 10*50,
-    		timeout: 0
+    		interval: 10*50
     	};
 
     	this.httpOptions = httpOptions;
@@ -47,24 +46,28 @@
     		var state = {ping: null};
 
 
-    		function handleResponse(data, status) {
+    		function handleResponse(data, status, onetimeonly) {
     			$rootScope.$broadcast('$keepaliveResponse', data, status);
 
-    			schedulePing();
+    			if (!onetimeonly) schedulePing();
     		}
 
     		function schedulePing() {
     			state.ping = $timeout(ping, options.interval * 1000);
     		}
 
-    		function ping() {
+    		function ping(onetimeonly) {
     			$rootScope.$broadcast('$keepalive');
 
     			if (angular.isObject(options.http)) {
     			 	$http(options.http)
-    			 		.success(handleResponse)
-    			 		.error(handleResponse);
-    			} else schedulePing();
+    			 		.success(function(data, status) {
+    			 			handleResponse(data, status, onetimeonly);
+    			 		})
+    			 		.error(function(data, status) {
+    			 			handleResponse(data, status, onetimeonly);
+    			 		});
+    			} else if (!onetimeonly) schedulePing();
     		};
 
     		return {
@@ -78,6 +81,9 @@
     			},
     			stop: function() {
     				$timeout.cancel(state.ping);
+    			},
+    			ping: function() {
+    				ping(true);
     			}
     		};
     	}
@@ -92,7 +98,8 @@
             idleDuration: 20 * 60, // in seconds (default is 20min)
             warningDuration: 30, // in seconds (default is 30sec)
             autoResume: true, // lets events automatically resume (unsets idle state/resets warning)
-            events: 'mousemove keydown DOMMouseScroll mousewheel mousedown'
+            events: 'mousemove keydown DOMMouseScroll mousewheel mousedown',
+            keepalive: true
         };
 
         this.activeOn = activeOn;
@@ -119,11 +126,30 @@
         	options.autoResume = value === true;
         }
 
+        this.keepalive = keepalive;
+        function keepalive(enabled) {
+        	options.keepalive = enabled === true;
+        }
+
         this.$get = $get;
-        $get.$inject = ['$timeout', '$log', '$rootScope', '$document'];
+        $get.$inject = ['$timeout', '$log', '$rootScope', '$document', '$keepalive'];
         
-        function $get($timeout, $log, $rootScope, $document) {
+        function $get($timeout, $log, $rootScope, $document, $keepalive) {
         	var state = {idle: null, warning: null, idling: false, running: false, countdown: null};
+
+        	function startKeepalive() {
+        		if (!options.keepalive) return;
+
+        		if (state.running) $keepalive.ping();
+
+        		$keepalive.start();
+        	}
+
+        	function stopKeepalive() {
+        		if (!options.keepalive) return;
+
+        		$keepalive.stop();
+        	}
 
         	function toggleState() {
         		state.idling = !state.idling;
@@ -132,8 +158,11 @@
         		$rootScope.$broadcast('$idle' + name);
 
         		if (state.idling) {
+        			stopKeepalive();
         			state.countdown = options.warningDuration;
         			countdown();
+        		} else {
+        			startKeepalive();
         		}
         	}
 
@@ -163,9 +192,10 @@
                 	$timeout.cancel(state.idle);
                 	$timeout.cancel(state.warning);
 
-                	state.running = true;
+					if (state.idling) toggleState();
+					else if (!state.running) startKeepalive();
 
-                	if (state.idling) toggleState();
+                	state.running = true;
 
                 	state.idle = $timeout(toggleState, options.idleDuration * 1000);
                 },

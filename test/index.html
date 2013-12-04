@@ -29,7 +29,9 @@
 				});
 
 				$scope.$on('$keepalive', function() {
-					$scope.events.push({event: '$keepalive', date: new Date()});
+					$scope.$apply(function() {
+						$scope.events.push({event: '$keepalive', date: new Date()});
+					});					
 				})
 			})
 			.config(function($idleProvider, $keepaliveProvider) {
@@ -39,7 +41,6 @@
 			})
 			.run(function($rootScope, $idle, $log, $keepalive){
 				$idle.watch();
-				$keepalive.start();
 
 				$log.debug('app started.');
 			});
