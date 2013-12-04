@@ -26,20 +26,20 @@
 
 				$scope.$on('$idleTimeout', function() {
 					$scope.events.push({event: '$idleTimeout', date: new Date()});
-				})
-			})
-			.config(function($idleProvider) {
-				$idleProvider.idleDuration(5);
-				$idleProvider.warningDuration(5);
-			})
-			.run(function($rootScope, $idle, $log){
-				$rootScope.$on('$idleStart', function() {
-					$log.debug('$idleStart');
-				});
-				$rootScope.$on('$idleEnd', function() {
-					$log.debug('$idleEnd');
 				});
 
+				$scope.$on('$keepalive', function() {
+					$scope.$apply(function() {
+						$scope.events.push({event: '$keepalive', date: new Date()});
+					});					
+				})
+			})
+			.config(function($idleProvider, $keepaliveProvider) {
+				$idleProvider.idleDuration(5);
+				$idleProvider.warningDuration(5);
+				$keepaliveProvider.interval(10);
+			})
+			.run(function($rootScope, $idle, $log, $keepalive){
 				$idle.watch();
 
 				$log.debug('app started.');
@@ -48,7 +48,7 @@
 	</head>
 	<body>
 		<div ng-controller="EventsCtrl">
-			<h1>$idle events</h1>
+			<h1>$idle and $keepalive events</h1>
 			<ul>
 				<li ng-repeat="event in events">{{event}}</li>
 			</ul>

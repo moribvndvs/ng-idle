@@ -2,7 +2,7 @@ ng-idle
 =======
 
 ## About
-Your user may be sitting at the bottom of the ocean like an addled schoolboy (his/her orders are 7 bloody hours old!). You may wish to detect these guys and respond, for example, to log them out so their sensitive data is protected, or taunt them, or whatever. I don't care.
+ You may wish to detect idle users and respond, for example, to log them out so their sensitive data is protected, or taunt them, or whatever. I don't care.
 
 This module will include a variety of services and directives to help you in this task.
 
@@ -13,9 +13,17 @@ _**Warning:** This is still in active development and subject to change without 
 Authored by Mike Grabski
 Licensed under [MIT](http://www.opensource.org/licenses/mit-license.php)
 
+## Requirements
+* Angular 1.2.0 or later (earlier might be possible but not tested).
+
+## What NgIdle Does
+Check out the Overview in the wiki.
+
 ## Getting Started
 
-First, you'll need AngularJS 1.2.1 or later (earlier possible, but not tested yet). You can then inject the `$idle` service into your app `run` or in a controller and call `$idle.watch()` when you want to start watching for idleness. You can stop watching anytime by calling `$idle.unwatch()`. `$idle` communicates through events broadcasted on `$rootScope`.
+Include `angular-idle.js` after `angular.js`. 
+
+Bare bones example:
 
 			// include the `ngIdle` module
 			var app = angular.module('demo', ['ngIdle']);
@@ -44,30 +52,36 @@ First, you'll need AngularJS 1.2.1 or later (earlier possible, but not tested ye
 					// the user has come back from AFK and is doing stuff. if you are warning them, you can use this to hide the dialog	
 				});
 
+				$scope.$on('$keepalive', function() {
+					// do something to keep the user's session alive
+				})
 
 			})
-			.config(function($idleProvider) {
+			.config(function($idleProvider, $keepaliveProvider) {
 				// configure $idle settings
-				$idleProvider.idleDuration(5);
-				$idleProvider.warningDuration(5);
+				$idleProvider.idleDuration(5); // in seconds
+				$idleProvider.warningDuration(5); // in seconds
+				$keepaliveProvider.interval(2); // in seconds
 			})
 			.run(function($idle){
-				// start watching when the app runs
+				// start watching when the app runs. also starts the $keepalive service by default.
 				$idle.watch();
 			});
 
-You can stop watching for idleness at any time by calling `$idle.unwatch()`.
+You may use `$keepalive` and `$idle` independently if you desire, but they are contained in the same script.
 
 ## Roadmap
 
-* **0.1**: The basic `$idle` service and `$idleProvider`.
-
-TBD
+**0.3** Some directives to make responding to events in the UI easier and more angular-like.
 
 ## Contributing
 
-TBD
+Contributors are welcome. I use the `git-flow` lifecyle, so `master` is the stable release and `development` is where latest ongoing development is happening.
 
 ## Developing
 
-TBD
+You will need Node/NPM, Grunt, and Bower. Once you checkout from git, run `npm install` then `bower install` to get dependencies.
+
+### Testing
+
+Use `grunt test` to run unit tests once, or `grunt test-server` to run them continuously.
