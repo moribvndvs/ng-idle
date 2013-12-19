@@ -265,6 +265,12 @@ describe('ngIdle', function() {
             	expect(create()._options().http).toEqualData({url: '/path/to/keepalive', method: 'POST', cache: false});
             });
 
+            it ('httpOptions() should throw if passed null or undefined argument', function() {
+            	expect(function() {
+            		$keepaliveProvider.httpOptions();
+            	}).toThrow(new Error('Argument must be a string containing a URL, or an object containing the HTTP request configuration.'))
+            });
+
             it ('interval() should update options', function() {
             	$keepaliveProvider.interval(10);
 

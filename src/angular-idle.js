@@ -21,6 +21,7 @@
 
     	this.httpOptions = httpOptions;
     	function httpOptions(value) {
+            if (!value) throw new Error('Argument must be a string containing a URL, or an object containing the HTTP request configuration.');
     		if (angular.isString(value)) {
     			value = {url: value, method: 'GET'};
     		}
