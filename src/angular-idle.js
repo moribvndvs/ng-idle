@@ -1,6 +1,6 @@
 /**
  * Respond to idle users in AngularJS
- * @version v0.2.1
+ * @version v0.2.2
  * @link http://hackedbychinese.github.io/ng-idle
  * @license MIT License, http://www.opensource.org/licenses/MIT
  */
