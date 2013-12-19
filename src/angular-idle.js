@@ -110,7 +110,7 @@
 
         this.idleDuration = idleDuration;
         function idleDuration(seconds) {
-        	if (seconds < 0) throw new Error("idleDuration must be a value in seconds, greatner than 0.");
+        	if (seconds <= 0) throw new Error("idleDuration must be a value in seconds, greater than 0.");
 
         	options.idleDuration = seconds;
         }

@@ -65,6 +65,17 @@ describe('ngIdle', function() {
                 expect(create()._options().idleDuration).toBe(500);
             });
 
+            it ('idleDuration() should throw if argument is less than or equal to zero.', function() {
+            	var expected = new Error('idleDuration must be a value in seconds, greater than 0.');
+            	expect(function() {
+            		$idleProvider.idleDuration(0);
+            	}).toThrow(expected);
+
+            	expect(function() {
+            		$idleProvider.idleDuration(-1);
+            	}).toThrow(expected);
+            })
+
             it('warningDuration() should update defaults', function() {
                 expect($idleProvider).not.toBeUndefined();
                 
