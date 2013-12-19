@@ -98,7 +98,7 @@
             idleDuration: 20 * 60, // in seconds (default is 20min)
             warningDuration: 30, // in seconds (default is 30sec)
             autoResume: true, // lets events automatically resume (unsets idle state/resets warning)
-            events: 'mousemove keydown DOMMouseScroll mousewheel mousedown',
+            events: 'mousemove keydown DOMMouseScroll mousewheel mousedown touchstart',
             keepalive: true
         };
 
