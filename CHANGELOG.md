@@ -1,3 +1,12 @@
+## 0.2.1
+
+### Fixes
+
+* #1: $keepaliveProvider.httpOptions throws an exception when passing a null argument
+* #3: Default keepalive interval is 500 seconds, should be 600
+* #4: idleDuration should not allow zero
+* #5: Added touchstart event to IdleProvider options.
+
 ## 0.2.0
 
 ### Features
