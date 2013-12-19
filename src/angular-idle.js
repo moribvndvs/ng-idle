@@ -16,7 +16,7 @@
     function $KeepaliveProvider() {
     	var options = {
     		httpOptions: null,
-    		interval: 10*50
+    		interval: 10*60
     	};
 
     	this.httpOptions = httpOptions;
