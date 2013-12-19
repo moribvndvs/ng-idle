@@ -65,6 +65,17 @@ describe('ngIdle', function() {
                 expect(create()._options().idleDuration).toBe(500);
             });
 
+            it ('idleDuration() should throw if argument is less than or equal to zero.', function() {
+            	var expected = new Error('idleDuration must be a value in seconds, greater than 0.');
+            	expect(function() {
+            		$idleProvider.idleDuration(0);
+            	}).toThrow(expected);
+
+            	expect(function() {
+            		$idleProvider.idleDuration(-1);
+            	}).toThrow(expected);
+            })
+
             it('warningDuration() should update defaults', function() {
                 expect($idleProvider).not.toBeUndefined();
                 
@@ -263,6 +274,12 @@ describe('ngIdle', function() {
             	$keepaliveProvider.httpOptions({url: '/path/to/keepalive', method: 'POST', cache: true});
 
             	expect(create()._options().http).toEqualData({url: '/path/to/keepalive', method: 'POST', cache: false});
+            });
+
+            it ('httpOptions() should throw if passed null or undefined argument', function() {
+            	expect(function() {
+            		$keepaliveProvider.httpOptions();
+            	}).toThrow(new Error('Argument must be a string containing a URL, or an object containing the HTTP request configuration.'))
             });
 
             it ('interval() should update options', function() {

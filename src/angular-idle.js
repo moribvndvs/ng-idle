@@ -1,6 +1,6 @@
 /**
  * Respond to idle users in AngularJS
- * @version v0.1.0
+ * @version v0.2.1
  * @link http://hackedbychinese.github.io/ng-idle
  * @license MIT License, http://www.opensource.org/licenses/MIT
  */
@@ -16,11 +16,12 @@
     function $KeepaliveProvider() {
     	var options = {
     		httpOptions: null,
-    		interval: 10*50
+    		interval: 10*60
     	};
 
     	this.httpOptions = httpOptions;
     	function httpOptions(value) {
+            if (!value) throw new Error('Argument must be a string containing a URL, or an object containing the HTTP request configuration.');
     		if (angular.isString(value)) {
     			value = {url: value, method: 'GET'};
     		}
@@ -98,7 +99,7 @@
             idleDuration: 20 * 60, // in seconds (default is 20min)
             warningDuration: 30, // in seconds (default is 30sec)
             autoResume: true, // lets events automatically resume (unsets idle state/resets warning)
-            events: 'mousemove keydown DOMMouseScroll mousewheel mousedown',
+            events: 'mousemove keydown DOMMouseScroll mousewheel mousedown touchstart',
             keepalive: true
         };
 
@@ -109,7 +110,7 @@
 
         this.idleDuration = idleDuration;
         function idleDuration(seconds) {
-        	if (seconds < 0) throw new Error("idleDuration must be a value in seconds, greatner than 0.");
+        	if (seconds <= 0) throw new Error("idleDuration must be a value in seconds, greater than 0.");
 
         	options.idleDuration = seconds;
         }

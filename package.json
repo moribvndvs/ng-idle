@@ -1,6 +1,6 @@
 {
   "name": "ng-idle",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Directives and services for responding to idle users in AngularJS",
   "scripts": {
     "test": "grunt test"

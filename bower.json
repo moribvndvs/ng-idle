@@ -1,13 +1,18 @@
 {
   "name": "ng-idle",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "homepage": "https://github.com/HackedByChinese/ng-idle",
-  "description": "Directives and services for handling idle users in AngularJS",
+  "description": "Responding to idle users in AngularJS",
   "main": "src/angular-idle.js",
   "keywords": [
     "angularjs",
     "idle",
-    "ng-idle"
+    "ng-idle",
+    "keepalive",
+    "ping",
+    "angular",
+    "user",
+    "session"
   ],
   "license": "MIT",
   "ignore": [
@@ -18,10 +23,10 @@
     "tests"
   ],
   "dependencies": {
-    "angular": "~1.2.1"
+    "angular": "~1.2.0"
   },
   "devDependencies": {
-    "angular-mocks": "~1.2.1",
+    "angular-mocks": "~1.2.0",
     "jquery": "~2.0.3"
   }
 }
