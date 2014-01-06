@@ -1,6 +1,6 @@
 /**
  * Respond to idle users in AngularJS
- * @version v0.2.2
+ * @version v0.2.3
  * @link http://hackedbychinese.github.io/ng-idle
  * @license MIT License, http://www.opensource.org/licenses/MIT
  */
@@ -19,8 +19,7 @@
     		interval: 10*60
     	};
 
-    	this.httpOptions = httpOptions;
-    	function httpOptions(value) {
+    	this.httpOptions = function (value) {
             if (!value) throw new Error('Argument must be a string containing a URL, or an object containing the HTTP request configuration.');
     		if (angular.isString(value)) {
     			value = {url: value, method: 'GET'};
@@ -31,18 +30,14 @@
     		options.http = value;
     	}
 
-    	this.interval = interval;
-    	function interval(seconds) {
+    	this.interval = function (seconds) {
     		seconds = parseInt(seconds);
 
     		if (isNaN(seconds) || seconds <= 0) throw new Error('Interval must be expressed in seconds and be greater than 0.');
     		options.interval = seconds;
     	}
 
-    	this.$get = $get;
-    	$get.inject = ['$rootScope', '$log', '$timeout', '$http'];
-
-    	function $get($rootScope, $log, $timeout, $http) {
+    	this.$get = function ($rootScope, $log, $timeout, $http) {
     		
     		var state = {ping: null};
 
@@ -87,7 +82,8 @@
     				ping(true);
     			}
     		};
-    	}
+    	};
+        this.$get.$inject = ['$rootScope', '$log', '$timeout', '$http'];
     }
 
     keepaliveNs.provider('$keepalive', $KeepaliveProvider);
@@ -103,39 +99,31 @@
             keepalive: true
         };
 
-        this.activeOn = activeOn;
-        function activeOn (events) {
+        this.activeOn = function (events) {
             options.events = events;
         };
 
-        this.idleDuration = idleDuration;
-        function idleDuration(seconds) {
+        this.idleDuration = function (seconds) {
         	if (seconds <= 0) throw new Error("idleDuration must be a value in seconds, greater than 0.");
 
         	options.idleDuration = seconds;
-        }
+        };
 
-        this.warningDuration = warningDuration;
-        function warningDuration(seconds) {
+        this.warningDuration = function (seconds) {
         	if (seconds < 0) throw new Error("warning must be a value in seconds, greatner than 0.");
 
         	options.warningDuration = seconds;
-        }
+        };
 
-        this.autoResume = autoResume;
-        function autoResume(value) {
+        this.autoResume = function (value) {
         	options.autoResume = value === true;
-        }
+        };
 
-        this.keepalive = keepalive;
-        function keepalive(enabled) {
+        this.keepalive = function (enabled) {
         	options.keepalive = enabled === true;
-        }
+        };
 
-        this.$get = $get;
-        $get.$inject = ['$timeout', '$log', '$rootScope', '$document', '$keepalive'];
-        
-        function $get($timeout, $log, $rootScope, $document, $keepalive) {
+        this.$get = function ($timeout, $log, $rootScope, $document, $keepalive) {
         	var state = {idle: null, warning: null, idling: false, running: false, countdown: null};
 
         	function startKeepalive() {
@@ -217,7 +205,8 @@
 
             return svc;
         };
-    }
+        this.$get.$inject = ['$timeout', '$log', '$rootScope', '$document', '$keepalive'];
+    };
 
     idleNs.provider('$idle', $IdleProvider);
     
