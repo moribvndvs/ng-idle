@@ -1,3 +1,8 @@
+## 0.2.3
+
+### Fixes
+* #6: Minified output is mangled.
+
 ## 0.2.2
 
 Housekeeping
