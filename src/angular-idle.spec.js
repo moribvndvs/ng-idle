@@ -264,21 +264,21 @@ describe('ngIdle', function() {
         };
 
         describe('$keepaliveProvider', function() {
-        	it ('httpOptions() should update options with simple GET', function() {
-            	$keepaliveProvider.httpOptions('/path/to/keepalive');
+        	it ('http() should update options with simple GET', function() {
+            	$keepaliveProvider.http('/path/to/keepalive');
 
             	expect(create()._options().http).toEqualData({url: '/path/to/keepalive', method: 'GET', cache: false});
             });
 
-            it ('httpOptions() should update options with http options object', function() {
-            	$keepaliveProvider.httpOptions({url: '/path/to/keepalive', method: 'POST', cache: true});
+            it ('http() should update options with http options object', function() {
+            	$keepaliveProvider.http({url: '/path/to/keepalive', method: 'POST', cache: true});
 
             	expect(create()._options().http).toEqualData({url: '/path/to/keepalive', method: 'POST', cache: false});
             });
 
-            it ('httpOptions() should throw if passed null or undefined argument', function() {
+            it ('http() should throw if passed null or undefined argument', function() {
             	expect(function() {
-            		$keepaliveProvider.httpOptions();
+            		$keepaliveProvider.http();
             	}).toThrow(new Error('Argument must be a string containing a URL, or an object containing the HTTP request configuration.'))
             });
 

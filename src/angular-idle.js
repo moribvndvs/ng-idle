@@ -15,11 +15,11 @@
     // $keepalive service and provider
     function $KeepaliveProvider() {
     	var options = {
-    		httpOptions: null,
+    		http: null,
     		interval: 10*60
     	};
 
-    	this.httpOptions = function (value) {
+    	this.http = function (value) {
             if (!value) throw new Error('Argument must be a string containing a URL, or an object containing the HTTP request configuration.');
     		if (angular.isString(value)) {
     			value = {url: value, method: 'GET'};
