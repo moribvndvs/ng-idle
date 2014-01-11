@@ -1,54 +1,223 @@
-<!DOCTYPE html>
-<html>
 
+<!DOCTYPE html>
+<html lang="en" ng-app="demo" id="ng-app">
   <head>
     <meta charset='utf-8' />
-    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Ng-idle : Responding to idle users in AngularJS applications." />
+    
+    <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css">
+    <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap-theme.min.css">
+    <link href="http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" media="screen" href="css/site.css">
 
-    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
-
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.8/angular.min.js"></script>
+    <script src="https://rawgithub.com/hackedbychinese/ng-idle/master/angular-idle.js"></script>
+    <script src="js/ui-bootstrap-tpls-0.9.0.min.js"></script>
+    <script src="js/app.js"></script>
     <title>Ng-idle</title>
   </head>
 
   <body>
 
-    <!-- HEADER -->
-    <div id="header_wrap" class="outer">
-        <header class="inner">
-          <a id="forkme_banner" href="https://github.com/HackedByChinese/ng-idle">View on GitHub</a>
+    <!-- Wrap all page content here -->
+    <div id="wrap">
 
-          <h1 id="project_title">Ng-idle</h1>
-          <h2 id="project_tagline">Responding to idle users in AngularJS applications.</h2>
+      <!-- Fixed navbar -->
+      <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+        <div class="container">
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#top">Ng-Idle</a>
+          </div>
+          <div class="collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+              <li><a href="#demo">Demo</a></li>
+              <li><a href="#gettingstarted">Getting Started</a></li>
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
 
-            <section id="downloads">
-              <a class="zip_download_link" href="https://github.com/HackedByChinese/ng-idle/zipball/master">Download this project as a .zip file</a>
-              <a class="tar_download_link" href="https://github.com/HackedByChinese/ng-idle/tarball/master">Download this project as a tar.gz file</a>
-            </section>
-        </header>
+      <header class="jumbotron" id="top">
+        <div class="container">
+          <h1>Ng-Idle</h1>
+          <p>
+            An AngularJS module for detecting and responding to idle users.
+          </p>
+          <p>
+            <a href="https://github.com/HackedByChinese/ng-idle" class="btn btn-primary"><i class="fa fa-github fa-lg"></i> Source</a>
+          </p>
+        </div>        
+      </header>
+
+      <!-- Begin page content -->
+      <div class="container">
+        <section id="demo" data-ng-controller="DemoCtrl">
+          <header class="page-header">
+            <h2>Demo</h2>
+          </header>
+          <p>
+          This example uses <code>$modal</code> from <a href="http://angular-ui.github.io/bootstrap">UI Bootstrap</a> to display a warning dialog that counts down the seconds until they are "timed out".
+          In your application, "timing out" might send an HTTP request to end the user's session and send them to a log in screen.
+         </p>
+         <p>
+          Click the <strong>Start Demo</strong> button to begin. Stay idle for 5 seconds, then click, scroll, etc. to reset your idle state. Click on <strong>Stop Demo</strong> to turn it off again.
+         </p>
+          <p>
+            <button type="button" class="btn btn-success" data-ng-hide="started" data-ng-click="start()"><i class="fa fa-play"></i> Start Demo</button>
+            <button type="button" class="btn btn-danger" data-ng-show="started" data-ng-click="stop()"><i class="fa fa-stop"></i> Stop Demo</button>
+          </p>
+        </section>
+        <section id="gettingstarted">
+          <header class="page-header">
+            <h2>Getting Started</h2>
+          </header>
+          <h3>Dependencies</h3>
+          <p>
+          The only required dependency is <a href="http://angularjs.org/">AngularJS (1.2 or later)</a>. If you wish to use the modal approach from this demo, see the "Getting Started" section for <a href="http://angular-ui.github.io/bootstrap">UI Bootstrap</a>.
+          </p>
+          <h3>Files to Download</h3>
+          <p>
+          You can use the unminified <code>angular-idle.js</code> for development and minified <code>angular-idle.min.js</code> for production from <a href="https://github.com/HackedByChinese/ng-idle">here</a> or install them from Bower by entering the command line <code>bower install ng-idle</code>.
+          </p>
+          <p>
+          Once you have the JS file, simply include it after AngularJS.
+<pre><code>&lt;script src="angular.min.js"&gt;&lt;/script&gt;
+&lt;script src="angular-idle.min.js"&gt;&lt;/script&gt;
+</code></pre>
+          </p>
+          <h3>Configure</h3>
+          <p>You will need to include the module as a dependency to your application module in your angular configuration.
+<pre><code>var myApp = angular.module('myApp', ['ngIdle']);
+</code></pre>
+          </p>
+          <p>You should also set your options using the <code>$keepaliveProvider</code> and <code>$idleProvider</code> in your <code>config</code> start-up function.</p>
+<pre><code>myApp.config(['$keepaliveProvider', '$idleProvider', function($keepaliveProvider, $idleProvider) {
+  $idleProvider.idleDuration(5);
+  $idleProvider.warningDuration(5);
+  $keepaliveProvider.interval(10);
+}]);
+</code></pre>
+          <p>
+            The <a href="https://github.com/HackedByChinese/ng-idle/wiki">wiki</a> contains the full description of configurable options for <a href="https://github.com/HackedByChinese/ng-idle/wiki/%24keepalive-and-%24keepaliveprovider">$keepaliveProvider</a> and <a href="https://github.com/HackedByChinese/ng-idle/wiki/%24idle-and-%24idleprovider">$idleProvider</a>
+          </p>
+          <h3>Implement</h3>
+          <p>The primary method in which your application will respond to the user's idle state will be through events broadcasted from the root scope. There are many ways to approach this, and the events are described <a href="https://github.com/HackedByChinese/ng-idle/wiki">in the wiki</a>.</p>
+          <p>The code below shows how the demo was implemented.</p>
+          <div class="code">
+            <tabset>
+              <tab heading="HTML">
+                <pre ng-non-bindable><code data-language="html" class="rainbow">
+&lt;section data-ng-controller=&quot;DemoCtrl&quot;&gt;<br/>  &lt;p&gt;<br/>    &lt;button type=&quot;button&quot; class=&quot;btn btn-success&quot; data-ng-hide=&quot;started&quot; data-ng-click=&quot;start()&quot;&gt;Start Demo&lt;/button&gt;<br/>    &lt;button type=&quot;button&quot; class=&quot;btn btn-danger&quot; data-ng-show=&quot;started&quot; data-ng-click=&quot;stop()&quot;&gt;Stop Demo&lt;/button&gt;<br/>  &lt;/p&gt;<br/>&lt;/section&gt;
+
+&lt;script type=&quot;text/ng-template&quot; id=&quot;warning-dialog.html&quot;&gt;<br/>  &lt;div class=&quot;modal-header&quot;&gt;<br/>   &lt;h3&gt;You're Idle. Do Something!&lt;/h3&gt;<br/>  &lt;/div&gt;<br/>  &lt;div class=&quot;modal-body&quot;&gt;<br/>   &lt;progressbar max=&quot;5&quot; value=&quot;5&quot; animate=&quot;false&quot; class=&quot;progress-striped active&quot;&gt;You'll be logged out in x seconds.&lt;/progressbar&gt;<br/>  &lt;/div&gt;<br/><br/>&lt;/script&gt;<br/>&lt;script type=&quot;text/ng-template&quot; id=&quot;timedout-dialog.html&quot;&gt;<br/>  &lt;div class=&quot;modal-header&quot;&gt;<br/>   &lt;h3&gt;You've Timed Out!&lt;/h3&gt;<br/>  &lt;/div&gt;<br/>  &lt;div class=&quot;modal-body&quot;&gt;<br/>   &lt;p&gt;<br/>      You were idle too long. Normally you'd be logged out, but in this demo just do anything and you'll be reset.<br/>   &lt;/p&gt;<br/> &lt;/div&gt;<br/>&lt;/script&gt;
+                </code></pre>
+              </tab>
+              <tab heading="JS">
+                <pre ng-non-bindable><code data-language="js" class="rainbow">
+  angular.module('demo', ['ngIdle', 'ui.bootstrap'])
+    .controller('DemoCtrl', function($scope, $idle, $keepalive, $modal){
+      $scope.started = false;
+
+      function closeModals() {
+        if ($scope.warning) {
+          $scope.warning.close();
+          $scope.warning = null;
+        }
+
+        if ($scope.timedout) {
+          $scope.timedout.close();
+          $scope.timedout = null;
+        }
+      }
+
+      $scope.$on('$idleStart', function() {
+        closeModals();
+
+        $scope.warning = $modal.open({
+          templateUrl: 'warning-dialog.html',
+          windowClass: 'modal-danger'
+        });
+      });
+
+      $scope.$on('$idleEnd', function() {
+        closeModals();
+      });
+
+      $scope.$on('$idleTimeout', function() {
+        closeModals();
+        $scope.timedout = $modal.open({
+          templateUrl: 'timedout-dialog.html',
+          windowClass: 'modal-danger'
+        });
+      });
+
+      $scope.start = function() {
+        closeModals();
+        $idle.watch();
+        $scope.started = true;
+      };
+
+      $scope.stop = function() {
+        closeModals();
+        $idle.unwatch();
+        $scope.started = false;
+
+      };
+    })
+    .config(function($idleProvider, $keepaliveProvider) {
+      $idleProvider.idleDuration(5);
+            $idleProvider.warningDuration(5);
+            $keepaliveProvider.interval(10);
+    });
+                </code></pre>
+              </tab>
+            </tabset>
+          </div>
+          <p>
+              You could configure the <code>$idle</code> service to start as soon as the application runs with the following:
+<pre><code>// assume myApp was defined according to the "Configure" example above
+myApp.run(['$idle', function($idle) {
+  $idle.watch();
+}]);
+</code></pre>
+            </p>
+        </section>
+      </div>
     </div>
 
-    <!-- MAIN CONTENT -->
-    <div id="main_content_wrap" class="outer">
-      <section id="main_content" class="inner">
-        <h1>
-<a name="ng-idle" class="anchor" href="#ng-idle"><span class="octicon octicon-link"></span></a>ng-idle</h1>
+    <footer id="footer">
+      <div class="container">
+        <p class="copyright">Designed and built by <a href="https://github.com/HackedByChinese">HackedByChinese</a>.</p>
+      </div>
+    </footer>
 
-<p>This module is used to detect and respond to idle users in your AngularJS application.</p>
+    <script type="text/ng-template" id="warning-dialog.html">
+      <div class="modal-header">
+          <h3>You're Idle. Do Something!</h3>
+      </div>
+      <div class="modal-body">
+          <progressbar max="5" value="5" animate="false" class="progress-striped active">You'll be logged out in x seconds.</progressbar>
+      </div>
 
-<p><strong>More coming soon</strong></p>
-      </section>
-    </div>
+    </script>
+    <script type="text/ng-template" id="timedout-dialog.html">
+      <div class="modal-header">
+          <h3>You've Timed Out!</h3>
+      </div>
+      <div class="modal-body">
+          <p>
+            You were idle too long. Normally you'd be logged out, but in this demo just do anything and you'll be reset.
+          </p>
+      </div>
 
-    <!-- FOOTER  -->
-    <div id="footer_wrap" class="outer">
-      <footer class="inner">
-        <p class="copyright">Ng-idle maintained by <a href="https://github.com/HackedByChinese">HackedByChinese</a></p>
-        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
-      </footer>
-    </div>
-
-    
-
+    </script>
   </body>
 </html>

@@ -1,0 +1,56 @@
+/* Sticky footer styles
+-------------------------------------------------- */
+
+html,
+body {
+  height: 100%;
+  /* The html and body elements cannot have any padding or margin. */
+}
+
+/* Wrapper for page content to push down footer */
+#wrap {
+  min-height: 100%;
+  height: auto;
+  /* Negative indent footer by its height */
+  margin: 0 auto -60px;
+  /* Pad bottom by footer height */
+  padding: 0 0 60px;
+}
+
+/* Set the fixed height of the footer here */
+#footer {
+  height: 60px;
+  background-color: #f5f5f5;
+  padding-top: 15px;
+}
+
+#top {
+  padding-top: 50px;
+}
+
+/* code example styles */
+.code .nav-tabs .active a, .code .nav-tabs .active a:hover {
+  background-color: #f5f5f5;
+  border-color: #ccc;
+  border-bottom-color: #f5f5f5;
+}
+
+.code pre {
+  border-top: none;
+  border-top-left-radius: 0px;
+  border-top-right-radius: 0px;
+}
+
+/* modal styles */
+.modal-danger .modal-header {
+  background-color: #f2dede;
+  border-color: #ebccd1;
+  color: #a94442;
+  padding:9px 15px;
+  -webkit-border-top-left-radius: 5px;
+  -webkit-border-top-right-radius: 5px;
+  -moz-border-radius-topleft: 5px;
+  -moz-border-radius-topright: 5px;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+}
