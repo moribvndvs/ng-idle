@@ -382,4 +382,42 @@ describe('ngIdle', function() {
 			});
 		});
     });
+
+	describe('ng-idle-countdown', function() {
+		beforeEach(module('ngIdle', function($provide) {
+			$provide.decorator('$idle', function($delegate) {
+				return $delegate;
+			});
+		}));
+
+		var $compile, $scope, $idle, create;
+
+        beforeEach(inject(function (_$rootScope_, _$compile_, _$idle_) {
+            $scope = _$rootScope_;
+            $compile = _$compile_;
+            $idle = _$idle_;
+
+            create = function() {
+            	var el = $compile(angular.element('<div ng-idle-countdown="countdown">{{countdown}} seconds remaining.</div>'))($scope);
+            	$scope.$digest();
+            	return el;
+            };
+        }));
+
+        it('should update countdown scope value when receiving new $idleWarning event', function() {
+        	create();
+
+        	$scope.$broadcast('$idleWarn', 5);
+
+        	expect($scope.countdown).toBe(5);
+        });
+
+        it('should update countdown scope value to 0 on $idleTimeout event', function() {
+			create();
+
+        	$scope.$broadcast('$idleTimeout');
+
+        	expect($scope.countdown).toBe(0);
+        })
+	});
 });

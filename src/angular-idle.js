@@ -5,12 +5,7 @@
  * @license MIT License, http://www.opensource.org/licenses/MIT
  */
 (function (window, angular, undefined) {
-    'use strict';
-
-    // register modules
-    var idleNs = angular.module('ngIdle.idle', []);
-    var keepaliveNs = angular.module('ngIdle.keepalive', [])
-    angular.module('ngIdle', ['ngIdle.keepalive', 'ngIdle.idle']);
+    'use strict';    
 
     // $keepalive service and provider
     function $KeepaliveProvider() {
@@ -86,7 +81,8 @@
         this.$get.$inject = ['$rootScope', '$log', '$timeout', '$http'];
     }
 
-    keepaliveNs.provider('$keepalive', $KeepaliveProvider);
+    angular.module('ngIdle.keepalive', [])
+        .provider('$keepalive', $KeepaliveProvider);
 
     // $idle service and provider
     function $IdleProvider() {
@@ -208,6 +204,32 @@
         this.$get.$inject = ['$timeout', '$log', '$rootScope', '$document', '$keepalive'];
     };
 
-    idleNs.provider('$idle', $IdleProvider);
+    angular.module('ngIdle.idle', [])
+        .provider('$idle', $IdleProvider);
+
+    angular.module('ngIdle.ngIdleCountdown', [])
+        .directive('ngIdleCountdown', function() {
+            return {
+                restrict: 'A',
+                scope: {
+                    value: '=ngIdleCountdown'
+                },
+                link: function($scope) {
+                    $scope.$on('$idleWarn', function(e, countdown) {
+                        $scope.$apply(function() {
+                            $scope.value = countdown;
+                        });                        
+                    });
+
+                    $scope.$on('$idleTimeout', function() {
+                        $scope.$apply(function() {
+                            $scope.value = 0;
+                        });
+                    });
+                }
+            };
+        });
+
+    angular.module('ngIdle', ['ngIdle.keepalive', 'ngIdle.idle', 'ngIdle.ngIdleCountdown']);
     
 })(window, window.angular);
