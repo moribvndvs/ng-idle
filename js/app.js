@@ -21,7 +21,7 @@
 
 				$scope.warning = $modal.open({
 					templateUrl: 'warning-dialog.html',
-					windowClass: 'modal-danger'
+					windowClass: 'modal-warning'
 				});
 			});
 

@@ -13,7 +13,7 @@
     <link rel="stylesheet" type="text/css" media="screen" href="css/site.css">
 
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.8/angular.min.js"></script>
-    <script src="https://rawgithub.com/hackedbychinese/ng-idle/master/angular-idle.js"></script>
+    <script src="https://rawgithub.com/hackedbychinese/ng-idle/master/angular-idle.min.js"></script>
     <script src="js/ui-bootstrap-tpls-0.9.0.min.js"></script>
     <script src="js/app.js"></script>
     <title>Ng-idle</title>
@@ -117,7 +117,7 @@
                 <pre ng-non-bindable><code data-language="html" class="rainbow">
 &lt;section data-ng-controller=&quot;DemoCtrl&quot;&gt;<br/>  &lt;p&gt;<br/>    &lt;button type=&quot;button&quot; class=&quot;btn btn-success&quot; data-ng-hide=&quot;started&quot; data-ng-click=&quot;start()&quot;&gt;Start Demo&lt;/button&gt;<br/>    &lt;button type=&quot;button&quot; class=&quot;btn btn-danger&quot; data-ng-show=&quot;started&quot; data-ng-click=&quot;stop()&quot;&gt;Stop Demo&lt;/button&gt;<br/>  &lt;/p&gt;<br/>&lt;/section&gt;
 
-&lt;script type=&quot;text/ng-template&quot; id=&quot;warning-dialog.html&quot;&gt;<br/>  &lt;div class=&quot;modal-header&quot;&gt;<br/>   &lt;h3&gt;You're Idle. Do Something!&lt;/h3&gt;<br/>  &lt;/div&gt;<br/>  &lt;div class=&quot;modal-body&quot;&gt;<br/>   &lt;progressbar max=&quot;5&quot; value=&quot;5&quot; animate=&quot;false&quot; class=&quot;progress-striped active&quot;&gt;You'll be logged out in x seconds.&lt;/progressbar&gt;<br/>  &lt;/div&gt;<br/><br/>&lt;/script&gt;<br/>&lt;script type=&quot;text/ng-template&quot; id=&quot;timedout-dialog.html&quot;&gt;<br/>  &lt;div class=&quot;modal-header&quot;&gt;<br/>   &lt;h3&gt;You've Timed Out!&lt;/h3&gt;<br/>  &lt;/div&gt;<br/>  &lt;div class=&quot;modal-body&quot;&gt;<br/>   &lt;p&gt;<br/>      You were idle too long. Normally you'd be logged out, but in this demo just do anything and you'll be reset.<br/>   &lt;/p&gt;<br/> &lt;/div&gt;<br/>&lt;/script&gt;
+&lt;script type=&quot;text/ng-template&quot; id=&quot;warning-dialog.html&quot;&gt;<br/>  &lt;div class=&quot;modal-header&quot;&gt;<br/>   &lt;h3&gt;You're Idle. Do Something!&lt;/h3&gt;<br/>  &lt;/div&gt;<br/>  &lt;div ng-idle-countdown=&quot;countdown&quot; ng-init=&quot;countdown=5&quot; class=&quot;modal-body&quot;&gt;<br/>   &lt;progressbar max=&quot;5&quot; value=&quot;5&quot; animate=&quot;false&quot; class=&quot;progress-striped active&quot;&gt;You'll be logged out in {{countdown}} second(s).&lt;/progressbar&gt;<br/>  &lt;/div&gt;<br/><br/>&lt;/script&gt;<br/>&lt;script type=&quot;text/ng-template&quot; id=&quot;timedout-dialog.html&quot;&gt;<br/>  &lt;div class=&quot;modal-header&quot;&gt;<br/>   &lt;h3&gt;You've Timed Out!&lt;/h3&gt;<br/>  &lt;/div&gt;<br/>  &lt;div class=&quot;modal-body&quot;&gt;<br/>   &lt;p&gt;<br/>      You were idle too long. Normally you'd be logged out, but in this demo just do anything and you'll be reset.<br/>   &lt;/p&gt;<br/> &lt;/div&gt;<br/>&lt;/script&gt;
                 </code></pre>
               </tab>
               <tab heading="JS">
@@ -203,8 +203,9 @@ myApp.run(['$idle', function($idle) {
       <div class="modal-header">
           <h3>You're Idle. Do Something!</h3>
       </div>
-      <div class="modal-body">
-          <progressbar max="5" value="5" animate="false" class="progress-striped active">You'll be logged out in x seconds.</progressbar>
+      <div class="modal-body" ng-idle-countdown="countdown" ng-init="countdown=5">
+          <p>You'll be logged out in <span class="label label-warning">{{countdown}}</span> <span ng-pluralize="" count="countdown" when="{'one': 'second', 'other': 'seconds' }"></span>.</p>
+          <progressbar max="5" value="countdown" animate="true" class="progress-striped active" type="warning"></progressbar>
       </div>
 
     </script>
