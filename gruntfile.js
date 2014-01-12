@@ -21,9 +21,10 @@ module.exports = function(grunt) {
 				autoWatch: true
 			}
 		},
+		clean: ['angular-idle.js', 'angular-idle.min.js', 'angular-idle.map'],
 		copy: {
 			js: {
-				src: '/src/angular-idle.js',
+				src: 'src/angular-idle.js',
 				dest: 'angular-idle.js'
 			}
 		},
@@ -41,5 +42,5 @@ module.exports = function(grunt) {
 
 	grunt.registerTask('test', ['karma:unit']);
 	grunt.registerTask('test-server', ['karma:server']);
-	grunt.registerTask('build', ['uglify','copy:js']);
+	grunt.registerTask('build', ['clean', 'uglify','copy:js']);
 };
