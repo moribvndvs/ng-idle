@@ -258,8 +258,8 @@ describe('ngIdle', function() {
             });
         });
 
-        var create = function(httpOptions) {
-        	if (httpOptions) $keepaliveProvider.httpOptions(httpOptions);
+        var create = function(http) {
+        	if (http) $keepaliveProvider.http(http);
         	return $keepaliveProvider.$get($rootScope, $log, $timeout, $http);
         };
 
