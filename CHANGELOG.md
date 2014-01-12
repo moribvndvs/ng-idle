@@ -1,3 +1,8 @@
+## 0.3.0
+
+### Features
+* Added `ng-idle-countdown` directive.
+
 ## 0.2.3
 
 ### Fixes

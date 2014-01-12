@@ -72,7 +72,7 @@ You may use `$keepalive` and `$idle` independently if you desire, but they are c
 
 ## Roadmap
 
-**0.3** Some directives to make responding to events in the UI easier and more angular-like.
+??
 
 ## Contributing
 
