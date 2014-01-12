@@ -220,6 +220,12 @@
                             $scope.value = countdown;
                         });                        
                     });
+
+                    $scope.$on('$idleTimeout', function() {
+                        $scope.$apply(function() {
+                            $scope.value = 0;
+                        });
+                    });
                 }
             };
         });

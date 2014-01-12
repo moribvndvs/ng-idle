@@ -405,13 +405,19 @@ describe('ngIdle', function() {
         }));
 
         it('should update countdown scope value when receiving new $idleWarning event', function() {
-        	$scope.countdown = 99;
-
         	create();
 
         	$scope.$broadcast('$idleWarn', 5);
 
         	expect($scope.countdown).toBe(5);
         });
+
+        it('should update countdown scope value to 0 on $idleTimeout event', function() {
+			create();
+
+        	$scope.$broadcast('$idleTimeout');
+
+        	expect($scope.countdown).toBe(0);
+        })
 	});
 });
