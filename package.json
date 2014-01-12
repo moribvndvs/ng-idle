@@ -1,6 +1,6 @@
 {
   "name": "ng-idle",
-  "version": "0.2.3",
+  "version": "0.3.0",
   "description": "Directives and services for responding to idle users in AngularJS",
   "scripts": {
     "test": "grunt test"
@@ -15,7 +15,7 @@
     "url": "https://github.com/HackedByChinese/ng-idle/issues"
   },
   "devDependencies": {
-  	"grunt": "~0.4.1",
+    "grunt": "~0.4.1",
     "grunt-contrib-jshint": "~0.6.3",
     "grunt-contrib-nodeunit": "~0.2.0",
     "grunt-contrib-uglify": "~0.2.7",
@@ -26,6 +26,7 @@
     "karma-jasmine": "*",
     "karma-chrome-launcher": "*",
     "karma-firefox-launcher": "*",
-    "karma-ng-html2js-preprocessor": "*"
+    "karma-ng-html2js-preprocessor": "*",
+    "grunt-contrib-clean": "~0.5.0"
   }
 }

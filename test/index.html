@@ -47,11 +47,13 @@
 		</script>
 	</head>
 	<body>
-		<div ng-controller="EventsCtrl">
+		<div ng-controller="EventsCtrl" ng-idle-countdown="countdown">
 			<h1>$idle and $keepalive events</h1>
 			<ul>
 				<li ng-repeat="event in events">{{event}}</li>
 			</ul>
+
+			Timeout in {{countdown}} seconds.
 		</div>
 	</body>
 </html>

@@ -258,27 +258,27 @@ describe('ngIdle', function() {
             });
         });
 
-        var create = function(httpOptions) {
-        	if (httpOptions) $keepaliveProvider.httpOptions(httpOptions);
+        var create = function(http) {
+        	if (http) $keepaliveProvider.http(http);
         	return $keepaliveProvider.$get($rootScope, $log, $timeout, $http);
         };
 
         describe('$keepaliveProvider', function() {
-        	it ('httpOptions() should update options with simple GET', function() {
-            	$keepaliveProvider.httpOptions('/path/to/keepalive');
+        	it ('http() should update options with simple GET', function() {
+            	$keepaliveProvider.http('/path/to/keepalive');
 
             	expect(create()._options().http).toEqualData({url: '/path/to/keepalive', method: 'GET', cache: false});
             });
 
-            it ('httpOptions() should update options with http options object', function() {
-            	$keepaliveProvider.httpOptions({url: '/path/to/keepalive', method: 'POST', cache: true});
+            it ('http() should update options with http options object', function() {
+            	$keepaliveProvider.http({url: '/path/to/keepalive', method: 'POST', cache: true});
 
             	expect(create()._options().http).toEqualData({url: '/path/to/keepalive', method: 'POST', cache: false});
             });
 
-            it ('httpOptions() should throw if passed null or undefined argument', function() {
+            it ('http() should throw if passed null or undefined argument', function() {
             	expect(function() {
-            		$keepaliveProvider.httpOptions();
+            		$keepaliveProvider.http();
             	}).toThrow(new Error('Argument must be a string containing a URL, or an object containing the HTTP request configuration.'))
             });
 
@@ -382,4 +382,42 @@ describe('ngIdle', function() {
 			});
 		});
     });
+
+	describe('ng-idle-countdown', function() {
+		beforeEach(module('ngIdle', function($provide) {
+			$provide.decorator('$idle', function($delegate) {
+				return $delegate;
+			});
+		}));
+
+		var $compile, $scope, $idle, create;
+
+        beforeEach(inject(function (_$rootScope_, _$compile_, _$idle_) {
+            $scope = _$rootScope_;
+            $compile = _$compile_;
+            $idle = _$idle_;
+
+            create = function() {
+            	var el = $compile(angular.element('<div ng-idle-countdown="countdown">{{countdown}} seconds remaining.</div>'))($scope);
+            	$scope.$digest();
+            	return el;
+            };
+        }));
+
+        it('should update countdown scope value when receiving new $idleWarning event', function() {
+        	create();
+
+        	$scope.$broadcast('$idleWarn', 5);
+
+        	expect($scope.countdown).toBe(5);
+        });
+
+        it('should update countdown scope value to 0 on $idleTimeout event', function() {
+			create();
+
+        	$scope.$broadcast('$idleTimeout');
+
+        	expect($scope.countdown).toBe(0);
+        })
+	});
 });
