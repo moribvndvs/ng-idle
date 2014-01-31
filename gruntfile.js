@@ -2,14 +2,25 @@ module.exports = function(grunt) {
 	// load all grunt tasks
   	require('matchdep').filterDev('grunt-*').forEach(grunt.loadNpmTasks);
 
+	var pkg = grunt.file.readJSON('package.json');
+
 	grunt.initConfig({
 		pkg: grunt.file.readJSON('package.json'),
 		banner: '/**'+
- '* Respond to idle users in AngularJS\n'+
+ '* <%= pkg.description %>\n'+
+ '* @author <%= pkg.author %>\n'+
  '* @version v<%= pkg.version %>\n'+
- '* @link http://hackedbychinese.github.io/ng-idle\n' +
- '* @license MIT License, http://www.opensource.org/licenses/MIT\n'+
+ '* @link <%= pkg.repository.url %>\n' +
+ '* @license <%= pkg.license %>\n'+
  '*/',
+  		bump: {
+ 			options: {
+ 				files: ['package.json', 'bower.json'],
+ 				commit: false,
+ 				createTag: false,
+ 				push: false
+ 			}
+ 		},
 		karma: {
 			options: {
 				configFile: 'karma.conf.js'
@@ -21,20 +32,25 @@ module.exports = function(grunt) {
 				autoWatch: true
 			}
 		},
-		clean: ['angular-idle.js', 'angular-idle.min.js', 'angular-idle.map'],
-		copy: {
+		clean: pkg.main,
+		concat: {
+			options: {
+				stripBanners: true,
+				banner: '<%= banner %>'
+			},
 			js: {
-				src: 'src/angular-idle.js',
+				src: ['src/angular-idle.js'],
 				dest: 'angular-idle.js'
 			}
 		},
 		uglify: {
 			js: {
-				src: ['src/angular-idle.js'],
+				src: ['angular-idle.js'],
 				dest: 'angular-idle.min.js',
 				options: {
 					banner: '<%= banner %>',
-					sourceMap: 'angular-idle.map'
+					sourceMap: true,
+					sourceMapName: 'angular-idle.map'
 				}
 			}
 		}
@@ -42,5 +58,5 @@ module.exports = function(grunt) {
 
 	grunt.registerTask('test', ['karma:unit']);
 	grunt.registerTask('test-server', ['karma:server']);
-	grunt.registerTask('build', ['clean', 'uglify','copy:js']);
+	grunt.registerTask('build', ['clean', 'concat:js', 'uglify']);
 };
