@@ -1,4 +1,4 @@
-ng-idle
+Ng-Idle &nbsp;[![Build Status](https://travis-ci.org/HackedByChinese/ng-idle.png?branch=master)](https://travis-ci.org/HackedByChinese/ng-idle)
 =======
 
 ## About
