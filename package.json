@@ -1,6 +1,6 @@
 {
   "name": "ng-idle",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Directives and services for responding to idle users in AngularJS",
   "main": [
     "angular-idle.js",
