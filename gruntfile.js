@@ -23,13 +23,15 @@ module.exports = function(grunt) {
  		},
 		karma: {
 			options: {
-				configFile: 'karma.conf.js'
+				configFile: 'karma.conf.js',
+				browsers: [ grunt.option('browser') || 'PhantomJS' ]
 			},
 			unit: {
 				singleRun: true
 			},
 			server: {
-				autoWatch: true
+				autoWatch: true,
+				browsers: [ grunt.option('browser') || 'Chrome']
 			}
 		},
 		clean: pkg.main,
