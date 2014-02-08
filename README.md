@@ -11,6 +11,7 @@ _**Warning:** This is still in active development and subject to change without 
 ========
 
 Authored by Mike Grabski @HackedByChinese <me@mikegrabski.com>
+
 Licensed under [MIT](http://www.opensource.org/licenses/mit-license.php)
 
 ## Requirements
