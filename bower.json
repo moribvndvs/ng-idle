@@ -1,13 +1,9 @@
 {
   "name": "ng-idle",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "homepage": "https://github.com/HackedByChinese/ng-idle",
   "description": "Responding to idle users in AngularJS",
-  "main": [
-      "angular-idle.js",
-      "angular-idle.min.js",
-      "angular-idle.map"
-    ],
+  "main": "angular-idle.js",
   "keywords": [
     "angularjs",
     "idle",
