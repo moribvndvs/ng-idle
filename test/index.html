@@ -9,7 +9,7 @@
 				$scope.events = [];
 
 				$scope.$on('$idleStart', function() {
-					$scope.events.push({event: '$idleStart', date: new Date()});					
+					$scope.events.push({event: '$idleStart', date: new Date()});
 				});
 
 				$scope.$on('$idleEnd', function() {
@@ -17,7 +17,7 @@
 					$scope.$apply(function() {
 						$scope.events.push({event: '$idleEnd', date: new Date()});
 					});
-					
+
 				});
 
 				$scope.$on('$idleWarn', function(e, countdown) {
@@ -29,9 +29,7 @@
 				});
 
 				$scope.$on('$keepalive', function() {
-					$scope.$apply(function() {
-						$scope.events.push({event: '$keepalive', date: new Date()});
-					});					
+					$scope.events.push({event: '$keepalive', date: new Date()});
 				})
 			})
 			.config(function($idleProvider, $keepaliveProvider) {
