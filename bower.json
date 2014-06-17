@@ -1,6 +1,6 @@
 {
   "name": "ng-idle",
-  "version": "0.3.3",
+  "version": "0.3.5",
   "homepage": "https://github.com/HackedByChinese/ng-idle",
   "description": "Responding to idle users in AngularJS",
   "main": "angular-idle.js",
