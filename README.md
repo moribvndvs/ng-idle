@@ -47,7 +47,7 @@ Bare bones example:
 				$scope.$on('$idleTimeout', function() {
 					// the user has timed out (meaning idleDuration + warningDuration has passed without any activity)
 					// this is where you'd log them
-				})
+				});
 
 				$scope.$on('$idleEnd', function() {
 					// the user has come back from AFK and is doing stuff. if you are warning them, you can use this to hide the dialog	
@@ -55,7 +55,7 @@ Bare bones example:
 
 				$scope.$on('$keepalive', function() {
 					// do something to keep the user's session alive
-				})
+				});
 
 			})
 			.config(function($idleProvider, $keepaliveProvider) {
