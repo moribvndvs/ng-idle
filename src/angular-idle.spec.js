@@ -11,7 +11,7 @@ describe('ngIdle', function() {
   });
 
   describe('idle', function() {
-    var $idleProvider, $interval, $rootScope, $log, $document, $keepalive;
+    var $idleProvider, $interval, $rootScope, $log, $document, $keepalive, $timeout;
     var DEFAULTIDLEDURATION = 20*60*1000, DEFAULTWARNINGDURATION = 30 * 1000;
 
     beforeEach(module('ngIdle.idle'));
@@ -26,11 +26,12 @@ describe('ngIdle', function() {
 
       module('app');
 
-      inject(function(_$interval_, _$log_, _$rootScope_, _$document_) {
+      inject(function(_$interval_, _$log_, _$rootScope_, _$document_, _$timeout_) {
         $rootScope = _$rootScope_;
         $interval = _$interval_;
         $log = _$log_;
         $document = _$document_;
+        $timeout = _$timeout_;
       });
 
       $keepalive = {
@@ -164,6 +165,7 @@ describe('ngIdle', function() {
         $idle.watch();
 
         $interval.flush(DEFAULTIDLEDURATION);
+        $timeout.flush();
 
         expect($rootScope.$broadcast).toHaveBeenCalledWith('$idleStart');
         expect($keepalive.stop).toHaveBeenCalled();
@@ -175,6 +177,7 @@ describe('ngIdle', function() {
         $idle.watch();
 
         $interval.flush(DEFAULTIDLEDURATION);
+        $timeout.flush();
 
         $idle.watch();
 
@@ -189,15 +192,24 @@ describe('ngIdle', function() {
         $idle.watch();
 
         $interval.flush(DEFAULTIDLEDURATION);
+        $timeout.flush();
 
         expect($rootScope.$broadcast).toHaveBeenCalledWith('$idleStart');
         expect($rootScope.$broadcast).toHaveBeenCalledWith('$idleWarn', 3);
+
         $interval.flush(1000);
+        $timeout.flush();
+
         expect($rootScope.$broadcast).toHaveBeenCalledWith('$idleWarn', 2);
+
         $interval.flush(1000);
+        $timeout.flush();
+
         expect($rootScope.$broadcast).toHaveBeenCalledWith('$idleWarn', 1);
 
         $interval.flush(1000);
+        $timeout.flush();
+
         expect($rootScope.$broadcast).toHaveBeenCalledWith('$idleTimeout');
 
         // ensure idle interval doesn't keep executing after $idleStart
@@ -214,6 +226,7 @@ describe('ngIdle', function() {
         $interval.flush(DEFAULTIDLEDURATION);
 
         $interval.flush(1000);
+        $timeout.flush();
 
         expect($idle.idling()).toBe(true);
 

@@ -141,7 +141,7 @@
           stopKeepalive();
           state.countdown = options.warningDuration;
           countdown();
-          state.warning = $interval(countdown, 1000, options.warningDuration);
+          state.warning = $interval(countdown, 1000, options.warningDuration, false);
         } else {
           startKeepalive();
         }
@@ -178,7 +178,7 @@
 
           state.running = true;
 
-          state.idle = $interval(toggleState, options.idleDuration * 1000);
+          state.idle = $interval(toggleState, options.idleDuration * 1000, 0, false);
         },
         unwatch: function() {
           $interval.cancel(state.idle);
