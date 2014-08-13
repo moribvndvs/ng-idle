@@ -11,7 +11,7 @@ describe('ngIdle', function() {
   });
 
   describe('idle', function() {
-    var $idleProvider, $interval, $rootScope, $log, $document, $keepalive;
+    var $idleProvider, $interval, $rootScope, $log, $document, $keepalive, $injector;
     var DEFAULTIDLEDURATION = 20*60*1000, DEFAULTWARNINGDURATION = 30 * 1000;
 
     beforeEach(module('ngIdle.idle'));
@@ -26,11 +26,12 @@ describe('ngIdle', function() {
 
       module('app');
 
-      inject(function(_$interval_, _$log_, _$rootScope_, _$document_) {
+      inject(function(_$interval_, _$log_, _$rootScope_, _$document_, _$injector_) {
         $rootScope = _$rootScope_;
         $interval = _$interval_;
         $log = _$log_;
         $document = _$document_;
+        $injector = _$injector_;
       });
 
       $keepalive = {
@@ -46,7 +47,7 @@ describe('ngIdle', function() {
 
     var create = function(keepalive) {
       if (angular.isDefined(keepalive)) $idleProvider.keepalive(keepalive);
-      return $idleProvider.$get($interval, $log, $rootScope, $document, $keepalive);
+      return $injector.invoke($idleProvider.$get, null, {$interval: $interval, $log: $log, $rootScope: $rootScope, $document: $document, $keepalive: $keepalive});
     };
 
     describe('$idleProvider', function() {
@@ -252,7 +253,7 @@ describe('ngIdle', function() {
 
 
   describe('keepalive', function() {
-    var $keepaliveProvider, $rootScope, $log, $httpBackend, $interval, $http;
+    var $keepaliveProvider, $rootScope, $log, $httpBackend, $interval, $http, $injector;
 
     beforeEach(module('ngIdle.keepalive'));
 
@@ -267,18 +268,19 @@ describe('ngIdle', function() {
 
       module('app');
 
-      inject(function(_$rootScope_, _$log_, _$httpBackend_, _$interval_, _$http_) {
+      inject(function(_$rootScope_, _$log_, _$httpBackend_, _$interval_, _$http_, _$injector_) {
         $rootScope = _$rootScope_;
         $log = _$log_;
         $httpBackend = _$httpBackend_;
         $interval = _$interval_;
         $http = _$http_;
+        $injector = _$injector_;
       });
     });
 
     var create = function(http) {
       if (http) $keepaliveProvider.http(http);
-      return $keepaliveProvider.$get($rootScope, $log, $interval, $http);
+      return $injector.invoke($keepaliveProvider.$get, null, {$rootScope: $rootScope, $log: $log, $interval: $interval, $http: $http});
     };
 
     describe('$keepaliveProvider', function() {

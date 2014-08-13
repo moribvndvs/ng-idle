@@ -29,7 +29,7 @@
       options.interval = seconds;
     };
 
-    this.$get = function($rootScope, $log, $interval, $http) {
+    this.$get = ['$rootScope', '$log', '$interval', '$http', function($rootScope, $log, $interval, $http) {
 
       var state = {
         ping: null
@@ -66,8 +66,7 @@
           ping();
         }
       };
-    };
-    this.$get.$inject = ['$rootScope', '$log', '$interval', '$http'];
+    }];
   }
 
   angular.module('ngIdle.keepalive', [])
@@ -108,7 +107,7 @@
       options.keepalive = enabled === true;
     };
 
-    this.$get = function($interval, $log, $rootScope, $document, $keepalive) {
+    this.$get = ['$interval', '$log', '$rootScope', '$document', '$keepalive', function($interval, $log, $rootScope, $document, $keepalive) {
       var state = {
         idle: null,
         warning: null,
@@ -196,8 +195,7 @@
       $document.find('body').on(options.events, interrupt);
 
       return svc;
-    };
-    this.$get.$inject = ['$interval', '$log', '$rootScope', '$document', '$keepalive'];
+    }];
   }
 
   angular.module('ngIdle.idle', [])
