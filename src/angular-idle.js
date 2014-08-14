@@ -149,18 +149,38 @@
       }
 
       function countdown() {
+        // countdown has expired, so signal timeout
         if (state.countdown <= 0) {
-          $rootScope.$broadcast('$idleTimeout');
-        } else {
-          $rootScope.$broadcast('$idleWarn', state.countdown);
+          timeout();
+          return;
         }
 
+        // countdown hasn't reached zero, so warn and decrement
+        $rootScope.$broadcast('$idleWarn', state.countdown);
         state.countdown--;
+      }
+
+      function timeout() {
+        stopKeepalive();
+        $interval.cancel(state.idle);
+        $interval.cancel(state.warning);
+
+        state.idling = true;
+        state.running = false;
+        state.countdown = 0;
+
+        $rootScope.$broadcast('$idleTimeout');
       }
 
       var svc = {
         _options: function() {
           return options;
+        },
+        _getNow: function() {
+          return new Date();
+        },
+        isExpired: function() {
+          return state.expiry && state.expiry <= this._getNow();
         },
         running: function() {
           return state.running;
@@ -172,8 +192,11 @@
           $interval.cancel(state.idle);
           $interval.cancel(state.warning);
 
-          if (state.idling) toggleState();
-          else if (!state.running) startKeepalive();
+          // calculate the absolute expiry date, as added insurance against a browser sleeping or paused in the background
+          state.expiry = new Date(new Date().getTime() + ((options.idleDuration + options.warningDuration) * 1000));
+
+          if (state.idling) toggleState(); // clears the idle state if currently idling
+          else if (!state.running) startKeepalive(); // if about to run, start keep alive
 
           state.running = true;
 
@@ -185,14 +208,24 @@
 
           state.idling = false;
           state.running = false;
+          state.expiry = null;
+        },
+        interrupt: function() {
+          if (!state.running) return;
+
+          if (this.isExpired()) {
+            timeout();
+            return;
+          }
+
+          // note: you can no longer auto resume once we exceed the expiry; you will reset state by calling watch() manually
+          if (options.autoResume) this.watch();
         }
       };
 
-      var interrupt = function() {
-        if (state.running && options.autoResume) svc.watch();
-      };
-
-      $document.find('body').on(options.events, interrupt);
+      $document.find('body').on(options.events, function() {
+        svc.interrupt();
+      });
 
       return svc;
     }];

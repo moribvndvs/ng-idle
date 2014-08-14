@@ -13,11 +13,7 @@
 				});
 
 				$scope.$on('$idleEnd', function() {
-					// not sure why we need $apply here but not the others
-					$scope.$apply(function() {
-						$scope.events.push({event: '$idleEnd', date: new Date()});
-					});
-
+					$scope.events.push({event: '$idleEnd', date: new Date()});
 				});
 
 				$scope.$on('$idleWarn', function(e, countdown) {
@@ -30,7 +26,11 @@
 
 				$scope.$on('$keepalive', function() {
 					$scope.events.push({event: '$keepalive', date: new Date()});
-				})
+				});
+
+				$scope.reset = function() {
+					$idle.watch();
+				}
 			})
 			.config(function($idleProvider, $keepaliveProvider) {
 				$idleProvider.idleDuration(5);
@@ -47,6 +47,7 @@
 	<body>
 		<div ng-controller="EventsCtrl" ng-idle-countdown="countdown">
 			<h1>$idle and $keepalive events</h1>
+			<button type="button" ng-click="reset()">Reset manually</button>
 			<ul>
 				<li ng-repeat="event in events">{{event}}</li>
 			</ul>

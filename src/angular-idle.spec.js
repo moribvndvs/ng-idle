@@ -234,6 +234,69 @@ describe('ngIdle', function() {
         expect($idle.idling()).toBe(false);
       });
 
+      it ('isExpired() should return false if the date/time is less than the idle duration', function() {
+        // sets the expiry to now + idle + warning duration
+        $idle.watch();
+
+        expect($idle.isExpired()).toBe(false);
+      });
+
+      it ('isExpired() should return true if the date/time is greater than or equal the idle duration + warning duration.', function() {
+        var secondsPassed = 0;
+
+        // fake now to return a time in the future.
+        spyOn($idle, '_getNow').andCallFake(function() {
+          return new Date(new Date().getTime() + ((DEFAULTIDLEDURATION + DEFAULTWARNINGDURATION + secondsPassed) * 1000));
+        });
+
+        // equal to expiry
+        $idle.watch();
+        expect($idle.isExpired()).toBe(true);
+
+        // greater than expiry
+        secondsPassed = 1;
+        $idle.watch();
+        expect($idle.isExpired()).toBe(true);
+
+        // far greater than expiry (90 days)
+        secondsPassed = 60 * 60 * 24 * 90;
+        $idle.watch();
+        expect($idle.isExpired()).toBe(true);
+      });
+
+      it ('interrupt() should call watch() if running and autoRest is true', function() {
+          spyOn($idle, 'watch').andCallThrough();
+
+          // arrange
+          $idle.watch(); // start watching
+          $idle.watch.reset(); // reset watch spy to ignore the prior setup call
+
+          $idle.interrupt();
+          expect($idle.watch).toHaveBeenCalled();
+      });
+
+      it ('interrupt() should broadcast $timeout if running and past expiry', function() {
+        spyOn($rootScope, '$broadcast');
+
+        // fake now to return a time in the future.
+        spyOn($idle, '_getNow').andCallFake(function() {
+          return new Date(new Date().getTime() + ((DEFAULTIDLEDURATION + DEFAULTWARNINGDURATION + 60) * 1000));
+        });
+
+        spyOn($idle, 'watch').andCallThrough();
+
+        // the original call to start watching
+        $idle.watch();
+        expect($rootScope.$broadcast).not.toHaveBeenCalled();
+        $idle.watch.reset();
+
+        // a subsequent call represents an interrupt
+        $idle.interrupt();
+        expect($rootScope.$broadcast).toHaveBeenCalledWith('$idleTimeout');
+        expect($idle.idling()).toBe(true);
+        expect($idle.watch).not.toHaveBeenCalled();
+      });
+
       // HACK: the body event listener is only respected the first time, and thus always checks the first $idle instance we created rather than the one we created last.
       // in practice, the functionality works fine, but here the test always fails. dunno how to fix it right now.
       // it ('document event should interrupt idle timeout', function() {
