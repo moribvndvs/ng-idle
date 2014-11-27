@@ -100,6 +100,38 @@ describe('ngIdle', function() {
 
         expect(create()._options().keepalive).toBe(false);
       });
+
+      it ('setting timeout() with false should set timeout to 0', function() {
+        expect($idleProvider).not.toBeUndefined();
+
+        $idleProvider.timeout(false);
+
+        expect(create()._options().timeout).toBe(0);
+      });
+
+      it ('setting timeout() with 0 should set timeout to 0', function() {
+        expect($idleProvider).not.toBeUndefined();
+
+        $idleProvider.timeout(0);
+
+        expect(create()._options().timeout).toBe(0);
+      });
+
+      it ('setting timeout() with should throw an error if NaN', function() {
+        expect($idleProvider).not.toBeUndefined();
+
+        expect(function() {
+          $idleProvider.timeout('hello');
+        }).toThrow(new Error('Timeout must be zero or false to disable the feature, or a positive integer (in seconds) to enable it.'));
+      });
+
+      it ('setting timeout() with with positive integer should set timeout', function() {
+        expect($idleProvider).not.toBeUndefined();
+
+        $idleProvider.timeout(999);
+
+        expect(create()._options().timeout).toBe(999);
+      });
     });
 
     describe('$idle', function() {

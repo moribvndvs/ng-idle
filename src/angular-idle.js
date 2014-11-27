@@ -79,10 +79,21 @@
 
     var options = {
       idleDuration: 20 * 60, // in seconds (default is 20min)
-      warningDuration: 30, // in seconds (default is 30sec)
+      warningDuration: 30, // in seconds (default is 30sec),
+      timeout: 30, // in seconds (default is 30sec)
       autoResume: true, // lets events automatically resume (unsets idle state/resets warning)
       events: 'mousemove keydown DOMMouseScroll mousewheel mousedown touchstart touchmove',
       keepalive: true
+    };
+
+    /**
+     *  Sets the number of seconds a user can be idle before they are considered timed out.
+     *  @param {Number|Boolean} seconds A positive number representing seconds OR 0 or false to disable this feature.
+     */
+    this.timeout = function(seconds) {
+      if (seconds === false) options.timeout = 0;
+      else if (angular.isNumber(seconds) && seconds >= 0) options.timeout = seconds;
+      else throw new Error('Timeout must be zero or false to disable the feature, or a positive integer (in seconds) to enable it.');
     };
 
     this.activeOn = function(events) {
