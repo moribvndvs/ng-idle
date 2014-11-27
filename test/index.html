@@ -34,7 +34,7 @@
 			})
 			.config(function($idleProvider, $keepaliveProvider) {
 				$idleProvider.idleDuration(5);
-				$idleProvider.warningDuration(5);
+				$idleProvider.timeout(5);
 				$keepaliveProvider.interval(10);
 			})
 			.run(function($rootScope, $idle, $log, $keepalive){

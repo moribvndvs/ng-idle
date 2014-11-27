@@ -12,7 +12,7 @@ describe('ngIdle', function() {
 
   describe('idle', function() {
     var $idleProvider, $interval, $rootScope, $log, $document, $keepalive, $injector;
-    var DEFAULTIDLEDURATION = 20*60*1000, DEFAULTWARNINGDURATION = 30 * 1000;
+    var DEFAULTIDLEDURATION = 20*60*1000, DEFAULTTIMEOUT = 30 * 1000;
 
     beforeEach(module('ngIdle.idle'));
 
@@ -77,14 +77,6 @@ describe('ngIdle', function() {
         expect(function() {
           $idleProvider.idleDuration(-1);
         }).toThrow(expected);
-      })
-
-      it('warningDuration() should update defaults', function() {
-        expect($idleProvider).not.toBeUndefined();
-
-        $idleProvider.warningDuration(500);
-
-        expect(create()._options().warningDuration).toBe(500);
       });
 
       it('autoResume() should update defaults', function() {
@@ -138,7 +130,7 @@ describe('ngIdle', function() {
       var $idle;
 
       beforeEach(function() {
-        $idleProvider.warningDuration(3);
+        $idleProvider.timeout(3);
         $idle = create();
       });
 
@@ -278,7 +270,7 @@ describe('ngIdle', function() {
 
         // fake now to return a time in the future.
         spyOn($idle, '_getNow').andCallFake(function() {
-          return new Date(new Date().getTime() + ((DEFAULTIDLEDURATION + DEFAULTWARNINGDURATION + secondsPassed) * 1000));
+          return new Date(new Date().getTime() + ((DEFAULTIDLEDURATION + DEFAULTTIMEOUT + secondsPassed) * 1000));
         });
 
         // equal to expiry
@@ -312,7 +304,7 @@ describe('ngIdle', function() {
 
         // fake now to return a time in the future.
         spyOn($idle, '_getNow').andCallFake(function() {
-          return new Date(new Date().getTime() + ((DEFAULTIDLEDURATION + DEFAULTWARNINGDURATION + 60) * 1000));
+          return new Date(new Date().getTime() + ((DEFAULTIDLEDURATION + DEFAULTTIMEOUT + 60) * 1000));
         });
 
         spyOn($idle, 'watch').andCallThrough();
