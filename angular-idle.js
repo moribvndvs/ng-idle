@@ -27,7 +27,7 @@
       options.http = value;
     };
 
-    this.interval = function(seconds) {
+    var setInterval = this.interval = function(seconds) {
       seconds = parseInt(seconds);
 
       if (isNaN(seconds) || seconds <= 0) throw new Error('Interval must be expressed in seconds and be greater than 0.');
@@ -59,10 +59,12 @@
         _options: function() {
           return options;
         },
+        setInterval: setInterval,
         start: function() {
           $interval.cancel(state.ping);
 
           state.ping = $interval(ping, options.interval * 1000);
+          return state.ping;
         },
         stop: function() {
           $interval.cancel(state.ping);
@@ -84,7 +86,7 @@
       idleDuration: 20 * 60, // in seconds (default is 20min)
       warningDuration: 30, // in seconds (default is 30sec)
       autoResume: true, // lets events automatically resume (unsets idle state/resets warning)
-      events: 'mousemove keydown DOMMouseScroll mousewheel mousedown touchstart',
+      events: 'mousemove keydown DOMMouseScroll mousewheel mousedown touchstart touchmove',
       keepalive: true
     };
 
