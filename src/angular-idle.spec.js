@@ -60,22 +60,22 @@ describe('ngIdle', function() {
         expect(create()._options().events).toBe('click');
       });
 
-      it('idleDuration() should update defaults', function() {
+      it('idle() should update defaults', function() {
         expect($idleProvider).not.toBeUndefined();
 
-        $idleProvider.idleDuration(500);
+        $idleProvider.idle(500);
 
-        expect(create()._options().idleDuration).toBe(500);
+        expect(create()._options().idle).toBe(500);
       });
 
-      it('idleDuration() should throw if argument is less than or equal to zero.', function() {
-        var expected = new Error('idleDuration must be a value in seconds, greater than 0.');
+      it('idle() should throw if argument is less than or equal to zero.', function() {
+        var expected = new Error('Idle must be a value in seconds, greater than 0.');
         expect(function() {
-          $idleProvider.idleDuration(0);
+          $idleProvider.idle(0);
         }).toThrow(expected);
 
         expect(function() {
-          $idleProvider.idleDuration(-1);
+          $idleProvider.idle(-1);
         }).toThrow(expected);
       });
 

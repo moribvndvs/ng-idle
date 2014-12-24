@@ -78,7 +78,7 @@
   function $IdleProvider() {
 
     var options = {
-      idleDuration: 20 * 60, // in seconds (default is 20min)
+      idle: 20 * 60, // in seconds (default is 20min)
       timeout: 30, // in seconds (default is 30sec)
       autoResume: true, // lets events automatically resume (unsets idle state/resets warning)
       events: 'mousemove keydown DOMMouseScroll mousewheel mousedown touchstart touchmove',
@@ -99,10 +99,10 @@
       options.events = events;
     };
 
-    this.idleDuration = function(seconds) {
-      if (seconds <= 0) throw new Error("idleDuration must be a value in seconds, greater than 0.");
+    this.idle = function(seconds) {
+      if (seconds <= 0) throw new Error("Idle must be a value in seconds, greater than 0.");
 
-      options.idleDuration = seconds;
+      options.idle = seconds;
     };
 
     this.autoResume = function(value) {
@@ -199,14 +199,14 @@
           $interval.cancel(state.timeout);
 
           // calculate the absolute expiry date, as added insurance against a browser sleeping or paused in the background
-          state.expiry = new Date(new Date().getTime() + ((options.idleDuration + options.timeout) * 1000));
+          state.expiry = new Date(new Date().getTime() + ((options.idle + options.timeout) * 1000));
 
           if (state.idling) toggleState(); // clears the idle state if currently idling
           else if (!state.running) startKeepalive(); // if about to run, start keep alive
 
           state.running = true;
 
-          state.idle = $interval(toggleState, options.idleDuration * 1000, 0, false);
+          state.idle = $interval(toggleState, options.idle * 1000, 0, false);
         },
         unwatch: function() {
           $interval.cancel(state.idle);
