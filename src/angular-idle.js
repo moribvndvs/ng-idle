@@ -95,8 +95,8 @@
       else throw new Error('Timeout must be zero or false to disable the feature, or a positive integer (in seconds) to enable it.');
     };
 
-    this.activeOn = function(events) {
-      options.events = events;
+    this.interrupt = function(events) {
+      options.interrupt = events;
     };
 
     this.idle = function(seconds) {
@@ -229,7 +229,7 @@
         }
       };
 
-      $document.find('body').on(options.events, function() {
+      $document.find('body').on(options.interrupt, function() {
         svc.interrupt();
       });
 

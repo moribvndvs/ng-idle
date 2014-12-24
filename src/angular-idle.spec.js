@@ -52,12 +52,12 @@ describe('ngIdle', function() {
 
     describe('$idleProvider', function() {
 
-      it('activeOn() should update defaults', function() {
+      it('interrupt() should update defaults', function() {
         expect($idleProvider).not.toBeUndefined();
 
-        $idleProvider.activeOn('click');
+        $idleProvider.interrupt('click');
 
-        expect(create()._options().events).toBe('click');
+        expect(create()._options().interrupt).toBe('click');
       });
 
       it('idle() should update defaults', function() {
