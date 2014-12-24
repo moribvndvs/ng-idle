@@ -33,7 +33,7 @@
 				}
 			})
 			.config(function($idleProvider, $keepaliveProvider) {
-				$idleProvider.idleDuration(5);
+				$idleProvider.idle(5);
 				$idleProvider.timeout(5);
 				$keepaliveProvider.interval(10);
 			})
