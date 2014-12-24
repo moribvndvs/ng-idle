@@ -334,6 +334,24 @@ describe('ngIdle', function() {
         $httpBackend.verifyNoOutstandingRequest();
       });
 
+      it('setInterval should update an interval option', function(){
+        $keepalive.setInterval(100);
+        expect(create()._options().interval).toBe(100);
+      });
+      it('start() after a new LONGER timeout should NOT broadcast $keepalive when the default timeout expires', function(){
+        spyOn($rootScope, '$broadcast');
+        $keepalive.setInterval(100*60);
+        $keepalive.start();
+        $interval.flush(DEFAULTKEEPALIVEINTERVAL);
+        expect($rootScope.$broadcast).not.toHaveBeenCalledWith('$keepalive');
+      });
+      it('start() after a new LONGER timeout should broadcast $keepalive when the new LONGER expires', function(){
+        spyOn($rootScope, '$broadcast');
+        $keepalive.setInterval(100);
+        $keepalive.start();
+        $interval.flush(100 * 1000);
+        expect($rootScope.$broadcast).toHaveBeenCalledWith('$keepalive');
+      });
       it('start() should schedule ping timeout that broadcasts $keepalive event when it expires.', function() {
         spyOn($rootScope, '$broadcast');
 
