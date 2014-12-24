@@ -64,6 +64,7 @@
           $interval.cancel(state.ping);
 
           state.ping = $interval(ping, options.interval * 1000);
+          return state.ping;
         },
         stop: function() {
           $interval.cancel(state.ping);
