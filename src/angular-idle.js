@@ -116,7 +116,7 @@
     this.$get = ['$interval', '$log', '$rootScope', '$document', '$keepalive', function($interval, $log, $rootScope, $document, $keepalive) {
       var state = {
         idle: null,
-        warning: null,
+        timeout: null,
         idling: false,
         running: false,
         countdown: null
@@ -146,7 +146,7 @@
           stopKeepalive();
           state.countdown = options.timeout;
           countdown();
-          state.warning = $interval(countdown, 1000, options.timeout, false);
+          state.timeout = $interval(countdown, 1000, options.timeout, false);
         } else {
           startKeepalive();
         }
@@ -169,7 +169,7 @@
       function timeout() {
         stopKeepalive();
         $interval.cancel(state.idle);
-        $interval.cancel(state.warning);
+        $interval.cancel(state.timeout);
 
         state.idling = true;
         state.running = false;
@@ -196,7 +196,7 @@
         },
         watch: function() {
           $interval.cancel(state.idle);
-          $interval.cancel(state.warning);
+          $interval.cancel(state.timeout);
 
           // calculate the absolute expiry date, as added insurance against a browser sleeping or paused in the background
           state.expiry = new Date(new Date().getTime() + ((options.idleDuration + options.timeout) * 1000));
@@ -210,7 +210,7 @@
         },
         unwatch: function() {
           $interval.cancel(state.idle);
-          $interval.cancel(state.warning);
+          $interval.cancel(state.timeout);
 
           state.idling = false;
           state.running = false;
