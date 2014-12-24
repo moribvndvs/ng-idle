@@ -81,7 +81,7 @@
       idle: 20 * 60, // in seconds (default is 20min)
       timeout: 30, // in seconds (default is 30sec)
       autoResume: true, // lets events automatically resume (unsets idle state/resets warning)
-      events: 'mousemove keydown DOMMouseScroll mousewheel mousedown touchstart touchmove',
+      interrupt: 'mousemove keydown DOMMouseScroll mousewheel mousedown touchstart touchmove',
       keepalive: true
     };
 
