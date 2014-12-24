@@ -11,7 +11,7 @@ describe('ngIdle', function() {
   });
 
   describe('idle', function() {
-    var $idleProvider, $interval, $rootScope, $log, $document, $keepalive;
+    var $idleProvider, $interval, $rootScope, $log, $document, $keepalive, $injector;
     var DEFAULTIDLEDURATION = 20*60*1000, DEFAULTWARNINGDURATION = 30 * 1000;
 
     beforeEach(module('ngIdle.idle'));
@@ -26,11 +26,12 @@ describe('ngIdle', function() {
 
       module('app');
 
-      inject(function(_$interval_, _$log_, _$rootScope_, _$document_) {
+      inject(function(_$interval_, _$log_, _$rootScope_, _$document_, _$injector_) {
         $rootScope = _$rootScope_;
         $interval = _$interval_;
         $log = _$log_;
         $document = _$document_;
+        $injector = _$injector_;
       });
 
       $keepalive = {
@@ -46,7 +47,7 @@ describe('ngIdle', function() {
 
     var create = function(keepalive) {
       if (angular.isDefined(keepalive)) $idleProvider.keepalive(keepalive);
-      return $idleProvider.$get($interval, $log, $rootScope, $document, $keepalive);
+      return $injector.invoke($idleProvider.$get, null, {$interval: $interval, $log: $log, $rootScope: $rootScope, $document: $document, $keepalive: $keepalive});
     };
 
     describe('$idleProvider', function() {
@@ -164,6 +165,7 @@ describe('ngIdle', function() {
         $idle.watch();
 
         $interval.flush(DEFAULTIDLEDURATION);
+        $rootScope.$digest();
 
         expect($rootScope.$broadcast).toHaveBeenCalledWith('$idleStart');
         expect($keepalive.stop).toHaveBeenCalled();
@@ -175,6 +177,7 @@ describe('ngIdle', function() {
         $idle.watch();
 
         $interval.flush(DEFAULTIDLEDURATION);
+        $rootScope.$digest();
 
         $idle.watch();
 
@@ -189,15 +192,24 @@ describe('ngIdle', function() {
         $idle.watch();
 
         $interval.flush(DEFAULTIDLEDURATION);
+        $rootScope.$digest();
 
         expect($rootScope.$broadcast).toHaveBeenCalledWith('$idleStart');
         expect($rootScope.$broadcast).toHaveBeenCalledWith('$idleWarn', 3);
+
         $interval.flush(1000);
+        $rootScope.$digest();
+
         expect($rootScope.$broadcast).toHaveBeenCalledWith('$idleWarn', 2);
+
         $interval.flush(1000);
+        $rootScope.$digest();
+
         expect($rootScope.$broadcast).toHaveBeenCalledWith('$idleWarn', 1);
 
         $interval.flush(1000);
+        $rootScope.$digest();
+
         expect($rootScope.$broadcast).toHaveBeenCalledWith('$idleTimeout');
 
         // ensure idle interval doesn't keep executing after $idleStart
@@ -214,11 +226,75 @@ describe('ngIdle', function() {
         $interval.flush(DEFAULTIDLEDURATION);
 
         $interval.flush(1000);
+        $rootScope.$digest();
 
         expect($idle.idling()).toBe(true);
 
         $idle.watch();
         expect($idle.idling()).toBe(false);
+      });
+
+      it ('isExpired() should return false if the date/time is less than the idle duration', function() {
+        // sets the expiry to now + idle + warning duration
+        $idle.watch();
+
+        expect($idle.isExpired()).toBe(false);
+      });
+
+      it ('isExpired() should return true if the date/time is greater than or equal the idle duration + warning duration.', function() {
+        var secondsPassed = 0;
+
+        // fake now to return a time in the future.
+        spyOn($idle, '_getNow').andCallFake(function() {
+          return new Date(new Date().getTime() + ((DEFAULTIDLEDURATION + DEFAULTWARNINGDURATION + secondsPassed) * 1000));
+        });
+
+        // equal to expiry
+        $idle.watch();
+        expect($idle.isExpired()).toBe(true);
+
+        // greater than expiry
+        secondsPassed = 1;
+        $idle.watch();
+        expect($idle.isExpired()).toBe(true);
+
+        // far greater than expiry (90 days)
+        secondsPassed = 60 * 60 * 24 * 90;
+        $idle.watch();
+        expect($idle.isExpired()).toBe(true);
+      });
+
+      it ('interrupt() should call watch() if running and autoRest is true', function() {
+          spyOn($idle, 'watch').andCallThrough();
+
+          // arrange
+          $idle.watch(); // start watching
+          $idle.watch.reset(); // reset watch spy to ignore the prior setup call
+
+          $idle.interrupt();
+          expect($idle.watch).toHaveBeenCalled();
+      });
+
+      it ('interrupt() should broadcast $timeout if running and past expiry', function() {
+        spyOn($rootScope, '$broadcast');
+
+        // fake now to return a time in the future.
+        spyOn($idle, '_getNow').andCallFake(function() {
+          return new Date(new Date().getTime() + ((DEFAULTIDLEDURATION + DEFAULTWARNINGDURATION + 60) * 1000));
+        });
+
+        spyOn($idle, 'watch').andCallThrough();
+
+        // the original call to start watching
+        $idle.watch();
+        expect($rootScope.$broadcast).not.toHaveBeenCalled();
+        $idle.watch.reset();
+
+        // a subsequent call represents an interrupt
+        $idle.interrupt();
+        expect($rootScope.$broadcast).toHaveBeenCalledWith('$idleTimeout');
+        expect($idle.idling()).toBe(true);
+        expect($idle.watch).not.toHaveBeenCalled();
       });
 
       // HACK: the body event listener is only respected the first time, and thus always checks the first $idle instance we created rather than the one we created last.
@@ -240,7 +316,7 @@ describe('ngIdle', function() {
 
 
   describe('keepalive', function() {
-    var $keepaliveProvider, $rootScope, $log, $httpBackend, $interval, $http;
+    var $keepaliveProvider, $rootScope, $log, $httpBackend, $interval, $http, $injector;
 
     beforeEach(module('ngIdle.keepalive'));
 
@@ -255,18 +331,19 @@ describe('ngIdle', function() {
 
       module('app');
 
-      inject(function(_$rootScope_, _$log_, _$httpBackend_, _$interval_, _$http_) {
+      inject(function(_$rootScope_, _$log_, _$httpBackend_, _$interval_, _$http_, _$injector_) {
         $rootScope = _$rootScope_;
         $log = _$log_;
         $httpBackend = _$httpBackend_;
         $interval = _$interval_;
         $http = _$http_;
+        $injector = _$injector_;
       });
     });
 
     var create = function(http) {
       if (http) $keepaliveProvider.http(http);
-      return $keepaliveProvider.$get($rootScope, $log, $interval, $http);
+      return $injector.invoke($keepaliveProvider.$get, null, {$rootScope: $rootScope, $log: $log, $interval: $interval, $http: $http});
     };
 
     describe('$keepaliveProvider', function() {

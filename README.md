@@ -22,7 +22,7 @@ Check out the Overview in the wiki.
 
 ## Getting Started
 
-Include `angular-idle.js` after `angular.js`. 
+Include `angular-idle.js` after `angular.js`.
 
 Bare bones example:
 
@@ -34,7 +34,7 @@ Bare bones example:
 				$scope.events = [];
 
 				$scope.$on('$idleStart', function() {
-					// the user appears to have gone idle					
+					// the user appears to have gone idle
 				});
 
 				$scope.$on('$idleWarn', function(e, countdown) {
@@ -47,15 +47,15 @@ Bare bones example:
 				$scope.$on('$idleTimeout', function() {
 					// the user has timed out (meaning idleDuration + warningDuration has passed without any activity)
 					// this is where you'd log them
-				})
+				});
 
 				$scope.$on('$idleEnd', function() {
-					// the user has come back from AFK and is doing stuff. if you are warning them, you can use this to hide the dialog	
+					// the user has come back from AFK and is doing stuff. if you are warning them, you can use this to hide the dialog
 				});
 
 				$scope.$on('$keepalive', function() {
 					// do something to keep the user's session alive
-				})
+				});
 
 			})
 			.config(function($idleProvider, $keepaliveProvider) {
@@ -81,7 +81,10 @@ Contributors are welcome. I use the `git-flow` lifecyle, so `master` is the stab
 
 ## Developing
 
-You will need Node/NPM, Grunt, and Bower. Once you checkout from git, run `npm install` then `bower install` to get dependencies.
+You will need Node/NPM, Grunt, and Bower. Once you checkout from git, run `npm install`. This will install all dev and bower dependencies so you can immediately build and test your working copy.
+
+### Building
+You can build the module by running `grunt build`.
 
 ### Testing
 

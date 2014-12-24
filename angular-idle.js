@@ -34,7 +34,7 @@
       options.interval = seconds;
     };
 
-    this.$get = function($rootScope, $log, $interval, $http) {
+    this.$get = ['$rootScope', '$log', '$interval', '$http', function($rootScope, $log, $interval, $http) {
 
       var state = {
         ping: null
@@ -72,8 +72,7 @@
           ping();
         }
       };
-    };
-    this.$get.$inject = ['$rootScope', '$log', '$interval', '$http'];
+    }];
   }
 
   angular.module('ngIdle.keepalive', [])
@@ -86,7 +85,7 @@
       idleDuration: 20 * 60, // in seconds (default is 20min)
       warningDuration: 30, // in seconds (default is 30sec)
       autoResume: true, // lets events automatically resume (unsets idle state/resets warning)
-      events: 'mousemove keydown DOMMouseScroll mousewheel mousedown touchstart',
+      events: 'mousemove keydown DOMMouseScroll mousewheel mousedown touchstart touchmove',
       keepalive: true
     };
 
@@ -114,7 +113,7 @@
       options.keepalive = enabled === true;
     };
 
-    this.$get = function($interval, $log, $rootScope, $document, $keepalive) {
+    this.$get = ['$interval', '$log', '$rootScope', '$document', '$keepalive', function($interval, $log, $rootScope, $document, $keepalive) {
       var state = {
         idle: null,
         warning: null,
@@ -147,7 +146,7 @@
           stopKeepalive();
           state.countdown = options.warningDuration;
           countdown();
-          state.warning = $interval(countdown, 1000, options.warningDuration);
+          state.warning = $interval(countdown, 1000, options.warningDuration, false);
         } else {
           startKeepalive();
         }
@@ -156,18 +155,38 @@
       }
 
       function countdown() {
+        // countdown has expired, so signal timeout
         if (state.countdown <= 0) {
-          $rootScope.$broadcast('$idleTimeout');
-        } else {
-          $rootScope.$broadcast('$idleWarn', state.countdown);
+          timeout();
+          return;
         }
 
+        // countdown hasn't reached zero, so warn and decrement
+        $rootScope.$broadcast('$idleWarn', state.countdown);
         state.countdown--;
+      }
+
+      function timeout() {
+        stopKeepalive();
+        $interval.cancel(state.idle);
+        $interval.cancel(state.warning);
+
+        state.idling = true;
+        state.running = false;
+        state.countdown = 0;
+
+        $rootScope.$broadcast('$idleTimeout');
       }
 
       var svc = {
         _options: function() {
           return options;
+        },
+        _getNow: function() {
+          return new Date();
+        },
+        isExpired: function() {
+          return state.expiry && state.expiry <= this._getNow();
         },
         running: function() {
           return state.running;
@@ -179,12 +198,15 @@
           $interval.cancel(state.idle);
           $interval.cancel(state.warning);
 
-          if (state.idling) toggleState();
-          else if (!state.running) startKeepalive();
+          // calculate the absolute expiry date, as added insurance against a browser sleeping or paused in the background
+          state.expiry = new Date(new Date().getTime() + ((options.idleDuration + options.warningDuration) * 1000));
+
+          if (state.idling) toggleState(); // clears the idle state if currently idling
+          else if (!state.running) startKeepalive(); // if about to run, start keep alive
 
           state.running = true;
 
-          state.idle = $interval(toggleState, options.idleDuration * 1000);
+          state.idle = $interval(toggleState, options.idleDuration * 1000, 0, false);
         },
         unwatch: function() {
           $interval.cancel(state.idle);
@@ -192,18 +214,27 @@
 
           state.idling = false;
           state.running = false;
+          state.expiry = null;
+        },
+        interrupt: function() {
+          if (!state.running) return;
+
+          if (this.isExpired()) {
+            timeout();
+            return;
+          }
+
+          // note: you can no longer auto resume once we exceed the expiry; you will reset state by calling watch() manually
+          if (options.autoResume) this.watch();
         }
       };
 
-      var interrupt = function() {
-        if (state.running && options.autoResume) svc.watch();
-      };
-
-      $document.find('body').on(options.events, interrupt);
+      $document.find('body').on(options.events, function() {
+        svc.interrupt();
+      });
 
       return svc;
-    };
-    this.$get.$inject = ['$interval', '$log', '$rootScope', '$document', '$keepalive'];
+    }];
   }
 
   angular.module('ngIdle.idle', [])
