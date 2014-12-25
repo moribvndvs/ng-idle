@@ -134,6 +134,30 @@ describe('ngIdle', function() {
         $idle = create();
       });
 
+      it ('setIdle() should update option.idle and restart', function() {
+        spyOn($idle, 'watch');
+        spyOn($idle, 'unwatch');
+        spyOn($idle, 'running').andCallFake(function() {return true;});
+
+        $idle.setIdle(100);
+
+        expect($idle._options().idle).toBe(100);
+        expect($idle.unwatch).toHaveBeenCalled();
+        expect($idle.watch).toHaveBeenCalled();
+      });
+
+      it ('setTimeout() should update option.timeout and restart', function() {
+        spyOn($idle, 'watch');
+        spyOn($idle, 'unwatch');
+        spyOn($idle, 'running').andCallFake(function() {return true;});
+
+        $idle.setTimeout(100);
+
+        expect($idle._options().timeout).toBe(100);
+        expect($idle.unwatch).toHaveBeenCalled();
+        expect($idle.watch).toHaveBeenCalled();
+      });
+
       it('watch() should clear timeouts and start running', function() {
         spyOn($interval, 'cancel');
 
