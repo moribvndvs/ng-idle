@@ -60,7 +60,7 @@ Bare bones example:
 			})
 			.config(function($idleProvider, $keepaliveProvider) {
 				// configure $idle settings
-				$idleProvider.idleDuration(5); // in seconds
+				$idleProvider.idle(5); // in seconds
 				$idleProvider.timeout(5); // in seconds
 				$keepaliveProvider.interval(2); // in seconds
 			})
