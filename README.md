@@ -45,7 +45,7 @@ Bare bones example:
 				});
 
 				$scope.$on('$idleTimeout', function() {
-					// the user has timed out (meaning idleDuration + warningDuration has passed without any activity)
+					// the user has timed out (meaning idleDuration + timeout has passed without any activity)
 					// this is where you'd log them
 				});
 
@@ -61,7 +61,7 @@ Bare bones example:
 			.config(function($idleProvider, $keepaliveProvider) {
 				// configure $idle settings
 				$idleProvider.idleDuration(5); // in seconds
-				$idleProvider.warningDuration(5); // in seconds
+				$idleProvider.timeout(5); // in seconds
 				$keepaliveProvider.interval(2); // in seconds
 			})
 			.run(function($idle){

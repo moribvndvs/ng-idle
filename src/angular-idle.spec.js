@@ -12,7 +12,7 @@ describe('ngIdle', function() {
 
   describe('idle', function() {
     var $idleProvider, $interval, $rootScope, $log, $document, $keepalive, $injector;
-    var DEFAULTIDLEDURATION = 20*60*1000, DEFAULTWARNINGDURATION = 30 * 1000;
+    var DEFAULTIDLEDURATION = 20*60*1000, DEFAULTTIMEOUT = 30 * 1000;
 
     beforeEach(module('ngIdle.idle'));
 
@@ -52,39 +52,31 @@ describe('ngIdle', function() {
 
     describe('$idleProvider', function() {
 
-      it('activeOn() should update defaults', function() {
+      it('interrupt() should update defaults', function() {
         expect($idleProvider).not.toBeUndefined();
 
-        $idleProvider.activeOn('click');
+        $idleProvider.interrupt('click');
 
-        expect(create()._options().events).toBe('click');
+        expect(create()._options().interrupt).toBe('click');
       });
 
-      it('idleDuration() should update defaults', function() {
+      it('idle() should update defaults', function() {
         expect($idleProvider).not.toBeUndefined();
 
-        $idleProvider.idleDuration(500);
+        $idleProvider.idle(500);
 
-        expect(create()._options().idleDuration).toBe(500);
+        expect(create()._options().idle).toBe(500);
       });
 
-      it('idleDuration() should throw if argument is less than or equal to zero.', function() {
-        var expected = new Error('idleDuration must be a value in seconds, greater than 0.');
+      it('idle() should throw if argument is less than or equal to zero.', function() {
+        var expected = new Error('Idle must be a value in seconds, greater than 0.');
         expect(function() {
-          $idleProvider.idleDuration(0);
+          $idleProvider.idle(0);
         }).toThrow(expected);
 
         expect(function() {
-          $idleProvider.idleDuration(-1);
+          $idleProvider.idle(-1);
         }).toThrow(expected);
-      })
-
-      it('warningDuration() should update defaults', function() {
-        expect($idleProvider).not.toBeUndefined();
-
-        $idleProvider.warningDuration(500);
-
-        expect(create()._options().warningDuration).toBe(500);
       });
 
       it('autoResume() should update defaults', function() {
@@ -100,13 +92,45 @@ describe('ngIdle', function() {
 
         expect(create()._options().keepalive).toBe(false);
       });
+
+      it ('setting timeout() with false should set timeout to 0', function() {
+        expect($idleProvider).not.toBeUndefined();
+
+        $idleProvider.timeout(false);
+
+        expect(create()._options().timeout).toBe(0);
+      });
+
+      it ('setting timeout() with 0 should set timeout to 0', function() {
+        expect($idleProvider).not.toBeUndefined();
+
+        $idleProvider.timeout(0);
+
+        expect(create()._options().timeout).toBe(0);
+      });
+
+      it ('setting timeout() with should throw an error if NaN', function() {
+        expect($idleProvider).not.toBeUndefined();
+
+        expect(function() {
+          $idleProvider.timeout('hello');
+        }).toThrow(new Error('Timeout must be zero or false to disable the feature, or a positive integer (in seconds) to enable it.'));
+      });
+
+      it ('setting timeout() with with positive integer should set timeout', function() {
+        expect($idleProvider).not.toBeUndefined();
+
+        $idleProvider.timeout(999);
+
+        expect(create()._options().timeout).toBe(999);
+      });
     });
 
     describe('$idle', function() {
       var $idle;
 
       beforeEach(function() {
-        $idleProvider.warningDuration(3);
+        $idleProvider.timeout(3);
         $idle = create();
       });
 
@@ -246,7 +270,7 @@ describe('ngIdle', function() {
 
         // fake now to return a time in the future.
         spyOn($idle, '_getNow').andCallFake(function() {
-          return new Date(new Date().getTime() + ((DEFAULTIDLEDURATION + DEFAULTWARNINGDURATION + secondsPassed) * 1000));
+          return new Date(new Date().getTime() + ((DEFAULTIDLEDURATION + DEFAULTTIMEOUT + secondsPassed) * 1000));
         });
 
         // equal to expiry
@@ -280,7 +304,7 @@ describe('ngIdle', function() {
 
         // fake now to return a time in the future.
         spyOn($idle, '_getNow').andCallFake(function() {
-          return new Date(new Date().getTime() + ((DEFAULTIDLEDURATION + DEFAULTWARNINGDURATION + 60) * 1000));
+          return new Date(new Date().getTime() + ((DEFAULTIDLEDURATION + DEFAULTTIMEOUT + 60) * 1000));
         });
 
         spyOn($idle, 'watch').andCallThrough();
@@ -311,6 +335,65 @@ describe('ngIdle', function() {
 
       // 	expect($idle.idling()).toBe(false);
       // });
+    });
+
+    describe('$idle with timeout disabled', function() {
+      var $idle;
+
+      beforeEach(function() {
+        $idleProvider.timeout(false);
+        $idle = create();
+      });
+
+      it('should NOT count down warning or signal timeout', function() {
+        spyOn($rootScope, '$broadcast');
+
+        $idle.watch();
+
+        $interval.flush(DEFAULTIDLEDURATION);
+        $rootScope.$digest();
+
+        expect($rootScope.$broadcast).toHaveBeenCalledWith('$idleStart');
+        expect($rootScope.$broadcast).not.toHaveBeenCalledWith('$idleWarn');
+
+        $interval.flush(1000);
+        $rootScope.$digest();
+
+        expect($rootScope.$broadcast).not.toHaveBeenCalledWith('$idleWarn');
+
+        $interval.flush(1000);
+        $rootScope.$digest();
+
+        expect($rootScope.$broadcast).not.toHaveBeenCalledWith('$idleWarn');
+
+        $interval.flush(1000);
+        $rootScope.$digest();
+
+        expect($rootScope.$broadcast).not.toHaveBeenCalledWith('$idleTimeout');
+      });
+
+      it ('interrupt() should not timeout if running and past expiry', function() {
+        spyOn($rootScope, '$broadcast');
+
+        // fake now to return a time in the future.
+        spyOn($idle, '_getNow').andCallFake(function() {
+          return new Date(new Date().getTime() + ((DEFAULTIDLEDURATION + DEFAULTTIMEOUT + 60) * 1000));
+        });
+
+        spyOn($idle, 'watch').andCallThrough();
+
+        // the original call to start watching
+        $idle.watch();
+        expect($rootScope.$broadcast).not.toHaveBeenCalled();
+        $idle.watch.reset();
+
+        // a subsequent call represents an interrupt
+        $idle.interrupt();
+        expect($rootScope.$broadcast).not.toHaveBeenCalledWith('$idleTimeout');
+        expect($idle.idling()).toBe(false);
+        expect($idle.watch).toHaveBeenCalled();
+      });
+
     });
   });
 

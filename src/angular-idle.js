@@ -78,27 +78,31 @@
   function $IdleProvider() {
 
     var options = {
-      idleDuration: 20 * 60, // in seconds (default is 20min)
-      warningDuration: 30, // in seconds (default is 30sec)
+      idle: 20 * 60, // in seconds (default is 20min)
+      timeout: 30, // in seconds (default is 30sec)
       autoResume: true, // lets events automatically resume (unsets idle state/resets warning)
-      events: 'mousemove keydown DOMMouseScroll mousewheel mousedown touchstart touchmove',
+      interrupt: 'mousemove keydown DOMMouseScroll mousewheel mousedown touchstart touchmove',
       keepalive: true
     };
 
-    this.activeOn = function(events) {
-      options.events = events;
+    /**
+     *  Sets the number of seconds a user can be idle before they are considered timed out.
+     *  @param {Number|Boolean} seconds A positive number representing seconds OR 0 or false to disable this feature.
+     */
+    this.timeout = function(seconds) {
+      if (seconds === false) options.timeout = 0;
+      else if (angular.isNumber(seconds) && seconds >= 0) options.timeout = seconds;
+      else throw new Error('Timeout must be zero or false to disable the feature, or a positive integer (in seconds) to enable it.');
     };
 
-    this.idleDuration = function(seconds) {
-      if (seconds <= 0) throw new Error("idleDuration must be a value in seconds, greater than 0.");
-
-      options.idleDuration = seconds;
+    this.interrupt = function(events) {
+      options.interrupt = events;
     };
 
-    this.warningDuration = function(seconds) {
-      if (seconds < 0) throw new Error("warning must be a value in seconds, greater than 0.");
+    this.idle = function(seconds) {
+      if (seconds <= 0) throw new Error("Idle must be a value in seconds, greater than 0.");
 
-      options.warningDuration = seconds;
+      options.idle = seconds;
     };
 
     this.autoResume = function(value) {
@@ -112,7 +116,7 @@
     this.$get = ['$interval', '$log', '$rootScope', '$document', '$keepalive', function($interval, $log, $rootScope, $document, $keepalive) {
       var state = {
         idle: null,
-        warning: null,
+        timeout: null,
         idling: false,
         running: false,
         countdown: null
@@ -140,9 +144,11 @@
 
         if (state.idling) {
           stopKeepalive();
-          state.countdown = options.warningDuration;
-          countdown();
-          state.warning = $interval(countdown, 1000, options.warningDuration, false);
+          if (options.timeout) {
+            state.countdown = options.timeout;
+            countdown();
+            state.timeout = $interval(countdown, 1000, options.timeout, false);
+          }
         } else {
           startKeepalive();
         }
@@ -165,7 +171,7 @@
       function timeout() {
         stopKeepalive();
         $interval.cancel(state.idle);
-        $interval.cancel(state.warning);
+        $interval.cancel(state.timeout);
 
         state.idling = true;
         state.running = false;
@@ -192,21 +198,23 @@
         },
         watch: function() {
           $interval.cancel(state.idle);
-          $interval.cancel(state.warning);
+          $interval.cancel(state.timeout);
 
           // calculate the absolute expiry date, as added insurance against a browser sleeping or paused in the background
-          state.expiry = new Date(new Date().getTime() + ((options.idleDuration + options.warningDuration) * 1000));
+          var timeout = !options.timeout ? 0 : options.timeout;
+          state.expiry = new Date(new Date().getTime() + ((options.idle + timeout) * 1000));
+
 
           if (state.idling) toggleState(); // clears the idle state if currently idling
           else if (!state.running) startKeepalive(); // if about to run, start keep alive
 
           state.running = true;
 
-          state.idle = $interval(toggleState, options.idleDuration * 1000, 0, false);
+          state.idle = $interval(toggleState, options.idle * 1000, 0, false);
         },
         unwatch: function() {
           $interval.cancel(state.idle);
-          $interval.cancel(state.warning);
+          $interval.cancel(state.timeout);
 
           state.idling = false;
           state.running = false;
@@ -215,7 +223,7 @@
         interrupt: function() {
           if (!state.running) return;
 
-          if (this.isExpired()) {
+          if (options.timeout && this.isExpired()) {
             timeout();
             return;
           }
@@ -225,7 +233,7 @@
         }
       };
 
-      $document.find('body').on(options.events, function() {
+      $document.find('body').on(options.interrupt, function() {
         svc.interrupt();
       });
 
