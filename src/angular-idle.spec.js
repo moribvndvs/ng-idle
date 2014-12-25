@@ -336,6 +336,65 @@ describe('ngIdle', function() {
       // 	expect($idle.idling()).toBe(false);
       // });
     });
+
+    describe('$idle with timeout disabled', function() {
+      var $idle;
+
+      beforeEach(function() {
+        $idleProvider.timeout(false);
+        $idle = create();
+      });
+
+      it('should NOT count down warning or signal timeout', function() {
+        spyOn($rootScope, '$broadcast');
+
+        $idle.watch();
+
+        $interval.flush(DEFAULTIDLEDURATION);
+        $rootScope.$digest();
+
+        expect($rootScope.$broadcast).toHaveBeenCalledWith('$idleStart');
+        expect($rootScope.$broadcast).not.toHaveBeenCalledWith('$idleWarn');
+
+        $interval.flush(1000);
+        $rootScope.$digest();
+
+        expect($rootScope.$broadcast).not.toHaveBeenCalledWith('$idleWarn');
+
+        $interval.flush(1000);
+        $rootScope.$digest();
+
+        expect($rootScope.$broadcast).not.toHaveBeenCalledWith('$idleWarn');
+
+        $interval.flush(1000);
+        $rootScope.$digest();
+
+        expect($rootScope.$broadcast).not.toHaveBeenCalledWith('$idleTimeout');
+      });
+
+      it ('interrupt() should not timeout if running and past expiry', function() {
+        spyOn($rootScope, '$broadcast');
+
+        // fake now to return a time in the future.
+        spyOn($idle, '_getNow').andCallFake(function() {
+          return new Date(new Date().getTime() + ((DEFAULTIDLEDURATION + DEFAULTTIMEOUT + 60) * 1000));
+        });
+
+        spyOn($idle, 'watch').andCallThrough();
+
+        // the original call to start watching
+        $idle.watch();
+        expect($rootScope.$broadcast).not.toHaveBeenCalled();
+        $idle.watch.reset();
+
+        // a subsequent call represents an interrupt
+        $idle.interrupt();
+        expect($rootScope.$broadcast).not.toHaveBeenCalledWith('$idleTimeout');
+        expect($idle.idling()).toBe(false);
+        expect($idle.watch).toHaveBeenCalled();
+      });
+
+    });
   });
 
 

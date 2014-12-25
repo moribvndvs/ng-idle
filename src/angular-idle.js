@@ -144,9 +144,11 @@
 
         if (state.idling) {
           stopKeepalive();
-          state.countdown = options.timeout;
-          countdown();
-          state.timeout = $interval(countdown, 1000, options.timeout, false);
+          if (options.timeout) {
+            state.countdown = options.timeout;
+            countdown();
+            state.timeout = $interval(countdown, 1000, options.timeout, false);
+          }
         } else {
           startKeepalive();
         }
@@ -199,7 +201,9 @@
           $interval.cancel(state.timeout);
 
           // calculate the absolute expiry date, as added insurance against a browser sleeping or paused in the background
-          state.expiry = new Date(new Date().getTime() + ((options.idle + options.timeout) * 1000));
+          var timeout = !options.timeout ? 0 : options.timeout;
+          state.expiry = new Date(new Date().getTime() + ((options.idle + timeout) * 1000));
+
 
           if (state.idling) toggleState(); // clears the idle state if currently idling
           else if (!state.running) startKeepalive(); // if about to run, start keep alive
@@ -219,7 +223,7 @@
         interrupt: function() {
           if (!state.running) return;
 
-          if (this.isExpired()) {
+          if (options.timeout && this.isExpired()) {
             timeout();
             return;
           }
