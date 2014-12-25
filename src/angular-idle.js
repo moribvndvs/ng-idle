@@ -89,7 +89,7 @@
      *  Sets the number of seconds a user can be idle before they are considered timed out.
      *  @param {Number|Boolean} seconds A positive number representing seconds OR 0 or false to disable this feature.
      */
-    this.timeout = function(seconds) {
+    var setTimeout = this.timeout = function(seconds) {
       if (seconds === false) options.timeout = 0;
       else if (angular.isNumber(seconds) && seconds >= 0) options.timeout = seconds;
       else throw new Error('Timeout must be zero or false to disable the feature, or a positive integer (in seconds) to enable it.');
@@ -99,8 +99,8 @@
       options.interrupt = events;
     };
 
-    this.idle = function(seconds) {
-      if (seconds <= 0) throw new Error("Idle must be a value in seconds, greater than 0.");
+    var setIdle = this.idle = function(seconds) {
+      if (seconds <= 0) throw new Error('Idle must be a value in seconds, greater than 0.');
 
       options.idle = seconds;
     };
@@ -180,12 +180,26 @@
         $rootScope.$broadcast('$idleTimeout');
       }
 
+      function changeOption(self, fn, value) {
+        var reset = self.running();
+
+        self.unwatch();
+        fn(value);
+        if (reset) self.watch();
+      }
+
       var svc = {
         _options: function() {
           return options;
         },
         _getNow: function() {
           return new Date();
+        },
+        setIdle: function(seconds) {
+          changeOption(this, setIdle, seconds);
+        },
+        setTimeout: function(seconds) {
+          changeOption(this, setTimeout, seconds);
         },
         isExpired: function() {
           return state.expiry && state.expiry <= this._getNow();

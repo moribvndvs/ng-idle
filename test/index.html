@@ -7,6 +7,8 @@
 			app
 			.controller('EventsCtrl', function($scope, $idle) {
 				$scope.events = [];
+				$scope.idle = 5;
+				$scope.timeout = 5;
 
 				$scope.$on('$idleStart', function() {
 					$scope.events.push({event: '$idleStart', date: new Date()});
@@ -31,10 +33,16 @@
 				$scope.reset = function() {
 					$idle.watch();
 				}
+
+				$scope.$watch('idle', function(value) {
+					if (value !== null) $idle.setIdle(value);
+				});
+
+				$scope.$watch('timeout', function(value) {
+					if (value !== null) $idle.setTimeout(value);
+				});
 			})
 			.config(function($idleProvider, $keepaliveProvider) {
-				$idleProvider.idle(5);
-				$idleProvider.timeout(5);
 				$keepaliveProvider.interval(10);
 			})
 			.run(function($rootScope, $idle, $log, $keepalive){
@@ -53,6 +61,13 @@
 			</ul>
 
 			Timeout in {{countdown}} seconds.
+
+			<div>
+				Change idle value <input type="number" ng-model="idle" />
+			</div>
+			<div>
+				Change timeout value <input type="number" ng-model="timeout" />
+			</div>
 		</div>
 	</body>
 </html>
