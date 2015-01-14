@@ -74,8 +74,8 @@
   angular.module('ngIdle.keepalive', [])
     .provider('$keepalive', $KeepaliveProvider);
 
-  // $idle service and provider
-  function $IdleProvider() {
+  // Idle service and provider
+  function IdleProvider() {
 
     var options = {
       idle: 20 * 60, // in seconds (default is 20min)
@@ -140,7 +140,7 @@
         state.idling = !state.idling;
         var name = state.idling ? 'Start' : 'End';
 
-        $rootScope.$broadcast('$idle' + name);
+        $rootScope.$broadcast('Idle' + name);
 
         if (state.idling) {
           stopKeepalive();
@@ -164,7 +164,7 @@
         }
 
         // countdown hasn't reached zero, so warn and decrement
-        $rootScope.$broadcast('$idleWarn', state.countdown);
+        $rootScope.$broadcast('IdleWarn', state.countdown);
         state.countdown--;
       }
 
@@ -177,7 +177,7 @@
         state.running = false;
         state.countdown = 0;
 
-        $rootScope.$broadcast('$idleTimeout');
+        $rootScope.$broadcast('IdleTimeout');
       }
 
       function changeOption(self, fn, value) {
@@ -256,7 +256,7 @@
   }
 
   angular.module('ngIdle.idle', [])
-    .provider('$idle', $IdleProvider);
+    .provider('Idle', IdleProvider);
 
   angular.module('ngIdle.ngIdleCountdown', [])
     .directive('ngIdleCountdown', function() {
@@ -266,11 +266,11 @@
           value: '=ngIdleCountdown'
         },
         link: function($scope) {
-          $scope.$on('$idleWarn', function(e, countdown) {
+          $scope.$on('IdleWarn', function(e, countdown) {
             $scope.value = countdown;
           });
 
-          $scope.$on('$idleTimeout', function() {
+          $scope.$on('IdleTimeout', function() {
             $scope.value = 0;
           });
         }
