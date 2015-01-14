@@ -618,7 +618,7 @@ describe('ngIdle', function() {
       Idle = _Idle_;
 
       create = function() {
-        var el = $compile(angular.element('<div ng-idle-countdown="countdown">{{countdown}} seconds remaining.</div>'))($scope);
+        var el = $compile(angular.element('<div idle-countdown="countdown">{{countdown}} seconds remaining.</div>'))($scope);
         $scope.$digest();
         return el;
       };

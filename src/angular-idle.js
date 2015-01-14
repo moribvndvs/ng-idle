@@ -258,12 +258,12 @@
   angular.module('ngIdle.idle', [])
     .provider('Idle', IdleProvider);
 
-  angular.module('ngIdle.ngIdleCountdown', [])
-    .directive('ngIdleCountdown', function() {
+  angular.module('ngIdle.idleCountdown', [])
+    .directive('idleCountdown', function() {
       return {
         restrict: 'A',
         scope: {
-          value: '=ngIdleCountdown'
+          value: '=idleCountdown'
         },
         link: function($scope) {
           $scope.$on('IdleWarn', function(e, countdown) {
@@ -277,6 +277,6 @@
       };
     });
 
-  angular.module('ngIdle', ['ngIdle.keepalive', 'ngIdle.idle', 'ngIdle.ngIdleCountdown']);
+  angular.module('ngIdle', ['ngIdle.keepalive', 'ngIdle.idle', 'ngIdle.idleCountdown']);
 
 })(window, window.angular);
