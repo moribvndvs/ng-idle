@@ -6,8 +6,6 @@ Ng-Idle &nbsp;[![Build Status](https://travis-ci.org/HackedByChinese/ng-idle.png
 
 This module will include a variety of services and directives to help you in this task.
 
-_**Warning:** This is still in active development and subject to change without noticed. Consider that carefully before including in your production projects. I expect the beta phase to last 1 to 20 years, and that should start in a decade or so._
-
 ========
 
 Authored by Mike Grabski @HackedByChinese <me@mikegrabski.com>
