@@ -53,23 +53,23 @@ Bare bones example:
 					// the user has come back from AFK and is doing stuff. if you are warning them, you can use this to hide the dialog
 				});
 
-				$scope.$on('$keepalive', function() {
+				$scope.$on('Keepalive', function() {
 					// do something to keep the user's session alive
 				});
 
 			})
-			.config(function(IdleProvider, $keepaliveProvider) {
+			.config(function(IdleProvider, KeepaliveProvider) {
 				// configure Idle settings
 				IdleProvider.idle(5); // in seconds
 				IdleProvider.timeout(5); // in seconds
-				$keepaliveProvider.interval(2); // in seconds
+				KeepaliveProvider.interval(2); // in seconds
 			})
 			.run(function(Idle){
-				// start watching when the app runs. also starts the $keepalive service by default.
+				// start watching when the app runs. also starts the Keepalive service by default.
 				Idle.watch();
 			});
 
-You may use `$keepalive` and `Idle` independently if you desire, but they are contained in the same script.
+You may use `Keepalive` and `Idle` independently if you desire, but they are contained in the same script.
 
 ## Roadmap
 

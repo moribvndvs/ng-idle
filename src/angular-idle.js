@@ -1,8 +1,8 @@
 (function(window, angular, undefined) {
   'use strict';
 
-  // $keepalive service and provider
-  function $KeepaliveProvider() {
+  // Keepalive service and provider
+  function KeepaliveProvider() {
     var options = {
       http: null,
       interval: 10 * 60
@@ -37,11 +37,11 @@
 
 
       function handleResponse(data, status) {
-        $rootScope.$broadcast('$keepaliveResponse', data, status);
+        $rootScope.$broadcast('KeepaliveResponse', data, status);
       }
 
       function ping() {
-        $rootScope.$broadcast('$keepalive');
+        $rootScope.$broadcast('Keepalive');
 
         if (angular.isObject(options.http)) {
           $http(options.http)
@@ -72,7 +72,7 @@
   }
 
   angular.module('ngIdle.keepalive', [])
-    .provider('$keepalive', $KeepaliveProvider);
+    .provider('Keepalive', KeepaliveProvider);
 
   // Idle service and provider
   function IdleProvider() {
@@ -113,7 +113,7 @@
       options.keepalive = enabled === true;
     };
 
-    this.$get = ['$interval', '$log', '$rootScope', '$document', '$keepalive', function($interval, $log, $rootScope, $document, $keepalive) {
+    this.$get = ['$interval', '$log', '$rootScope', '$document', 'Keepalive', function($interval, $log, $rootScope, $document, Keepalive) {
       var state = {
         idle: null,
         timeout: null,
@@ -125,15 +125,15 @@
       function startKeepalive() {
         if (!options.keepalive) return;
 
-        if (state.running) $keepalive.ping();
+        if (state.running) Keepalive.ping();
 
-        $keepalive.start();
+        Keepalive.start();
       }
 
       function stopKeepalive() {
         if (!options.keepalive) return;
 
-        $keepalive.stop();
+        Keepalive.stop();
       }
 
       function toggleState() {

@@ -26,8 +26,8 @@
 					$scope.events.push({event: 'IdleTimeout', date: new Date()});
 				});
 
-				$scope.$on('$keepalive', function() {
-					$scope.events.push({event: '$keepalive', date: new Date()});
+				$scope.$on('Keepalive', function() {
+					$scope.events.push({event: 'Keepalive', date: new Date()});
 				});
 
 				$scope.reset = function() {
@@ -42,10 +42,10 @@
 					if (value !== null) Idle.setTimeout(value);
 				});
 			})
-			.config(function(IdleProvider, $keepaliveProvider) {
-				$keepaliveProvider.interval(10);
+			.config(function(IdleProvider, KeepaliveProvider) {
+				KeepaliveProvider.interval(10);
 			})
-			.run(function($rootScope, Idle, $log, $keepalive){
+			.run(function($rootScope, Idle, $log, Keepalive){
 				Idle.watch();
 
 				$log.debug('app started.');
@@ -54,7 +54,7 @@
 	</head>
 	<body>
 		<div ng-controller="EventsCtrl" ng-idle-countdown="countdown">
-			<h1>Idle and $keepalive events</h1>
+			<h1>Idle and Keepalive events</h1>
 			<button type="button" ng-click="reset()">Reset manually</button>
 			<ul>
 				<li ng-repeat="event in events">{{event}}</li>

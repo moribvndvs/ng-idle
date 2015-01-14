@@ -11,7 +11,7 @@ describe('ngIdle', function() {
   });
 
   describe('idle', function() {
-    var IdleProvider, $interval, $rootScope, $log, $document, $keepalive, $injector;
+    var IdleProvider, $interval, $rootScope, $log, $document, Keepalive, $injector;
     var DEFAULTIDLEDURATION = 20*60*1000, DEFAULTTIMEOUT = 30 * 1000;
 
     beforeEach(module('ngIdle.idle'));
@@ -34,20 +34,20 @@ describe('ngIdle', function() {
         $injector = _$injector_;
       });
 
-      $keepalive = {
+      Keepalive = {
         start: function() {},
         stop: function() {},
         ping: function() {}
       };
 
-      spyOn($keepalive, 'start');
-      spyOn($keepalive, 'stop');
-      spyOn($keepalive, 'ping');
+      spyOn(Keepalive, 'start');
+      spyOn(Keepalive, 'stop');
+      spyOn(Keepalive, 'ping');
     });
 
     var create = function(keepalive) {
       if (angular.isDefined(keepalive)) IdleProvider.keepalive(keepalive);
-      return $injector.invoke(IdleProvider.$get, null, {$interval: $interval, $log: $log, $rootScope: $rootScope, $document: $document, $keepalive: $keepalive});
+      return $injector.invoke(IdleProvider.$get, null, {$interval: $interval, $log: $log, $rootScope: $rootScope, $document: $document, Keepalive: Keepalive});
     };
 
     describe('IdleProvider', function() {
@@ -165,14 +165,14 @@ describe('ngIdle', function() {
 
         expect($interval.cancel).toHaveBeenCalled();
         expect(Idle.running()).toBe(true);
-        expect($keepalive.start).toHaveBeenCalled();
+        expect(Keepalive.start).toHaveBeenCalled();
       });
 
       it('watch() should not start keepalive if disabled', function() {
         Idle = create(false);
 
         Idle.watch();
-        expect($keepalive.start).not.toHaveBeenCalled();
+        expect(Keepalive.start).not.toHaveBeenCalled();
       });
 
       it('should not stop keepalive when idle if keepalive integration is disabled', function() {
@@ -182,7 +182,7 @@ describe('ngIdle', function() {
 
         $interval.flush(DEFAULTIDLEDURATION);
 
-        expect($keepalive.stop).not.toHaveBeenCalled();
+        expect(Keepalive.stop).not.toHaveBeenCalled();
       });
 
       it('should not start or ping keepalive when returning from idle if integration is disabled', function() {
@@ -192,8 +192,8 @@ describe('ngIdle', function() {
         $interval.flush(DEFAULTIDLEDURATION);
         Idle.watch();
 
-        expect($keepalive.ping).not.toHaveBeenCalled();
-        expect($keepalive.start).not.toHaveBeenCalled();
+        expect(Keepalive.ping).not.toHaveBeenCalled();
+        expect(Keepalive.start).not.toHaveBeenCalled();
       });
 
       it('unwatch() should clear timeouts and stop running', function() {
@@ -216,7 +216,7 @@ describe('ngIdle', function() {
         $rootScope.$digest();
 
         expect($rootScope.$broadcast).toHaveBeenCalledWith('IdleStart');
-        expect($keepalive.stop).toHaveBeenCalled();
+        expect(Keepalive.stop).toHaveBeenCalled();
       });
 
       it('should broadcast IdleEnd, start keepalive and ping', function() {
@@ -230,8 +230,8 @@ describe('ngIdle', function() {
         Idle.watch();
 
         expect($rootScope.$broadcast).toHaveBeenCalledWith('IdleEnd');
-        expect($keepalive.ping).toHaveBeenCalled();
-        expect($keepalive.start).toHaveBeenCalled();
+        expect(Keepalive.ping).toHaveBeenCalled();
+        expect(Keepalive.start).toHaveBeenCalled();
       });
 
       it('should count down warning and then signal timeout', function() {
@@ -423,16 +423,16 @@ describe('ngIdle', function() {
 
 
   describe('keepalive', function() {
-    var $keepaliveProvider, $rootScope, $log, $httpBackend, $interval, $http, $injector;
+    var KeepaliveProvider, $rootScope, $log, $httpBackend, $interval, $http, $injector;
 
     beforeEach(module('ngIdle.keepalive'));
 
     beforeEach(function() {
       angular
         .module('app', function() {})
-        .config(['$keepaliveProvider',
-          function(_$keepaliveProvider_) {
-            $keepaliveProvider = _$keepaliveProvider_;
+        .config(['KeepaliveProvider',
+          function(_KeepaliveProvider_) {
+            KeepaliveProvider = _KeepaliveProvider_;
           }
         ]);
 
@@ -449,13 +449,13 @@ describe('ngIdle', function() {
     });
 
     var create = function(http) {
-      if (http) $keepaliveProvider.http(http);
-      return $injector.invoke($keepaliveProvider.$get, null, {$rootScope: $rootScope, $log: $log, $interval: $interval, $http: $http});
+      if (http) KeepaliveProvider.http(http);
+      return $injector.invoke(KeepaliveProvider.$get, null, {$rootScope: $rootScope, $log: $log, $interval: $interval, $http: $http});
     };
 
-    describe('$keepaliveProvider', function() {
+    describe('KeepaliveProvider', function() {
       it('http() should update options with simple GET', function() {
-        $keepaliveProvider.http('/path/to/keepalive');
+        KeepaliveProvider.http('/path/to/keepalive');
 
         expect(create()._options().http).toEqualData({
           url: '/path/to/keepalive',
@@ -465,7 +465,7 @@ describe('ngIdle', function() {
       });
 
       it('http() should update options with http options object', function() {
-        $keepaliveProvider.http({
+        KeepaliveProvider.http({
           url: '/path/to/keepalive',
           method: 'POST',
           cache: true
@@ -480,12 +480,12 @@ describe('ngIdle', function() {
 
       it('http() should throw if passed null or undefined argument', function() {
         expect(function() {
-          $keepaliveProvider.http();
+          KeepaliveProvider.http();
         }).toThrow(new Error('Argument must be a string containing a URL, or an object containing the HTTP request configuration.'));
       });
 
       it('interval() should update options', function() {
-        $keepaliveProvider.interval(10);
+        KeepaliveProvider.interval(10);
 
         expect(create()._options().interval).toBe(10);
       });
@@ -493,24 +493,24 @@ describe('ngIdle', function() {
       it('interval() should throw if nan or less than or equal to 0', function() {
 
         expect(function() {
-          $keepaliveProvider.interval('asdsad');
+          KeepaliveProvider.interval('asdsad');
         }).toThrow(new Error('Interval must be expressed in seconds and be greater than 0.'));
 
         expect(function() {
-          $keepaliveProvider.interval(0);
+          KeepaliveProvider.interval(0);
         }).toThrow(new Error('Interval must be expressed in seconds and be greater than 0.'));
 
         expect(function() {
-          $keepaliveProvider.interval(-1);
+          KeepaliveProvider.interval(-1);
         }).toThrow(new Error('Interval must be expressed in seconds and be greater than 0.'));
       });
     });
 
-    describe('$keepalive', function() {
-      var $keepalive, DEFAULTKEEPALIVEINTERVAL = 10*60*1000;
+    describe('Keepalive', function() {
+      var Keepalive, DEFAULTKEEPALIVEINTERVAL = 10*60*1000;
 
       beforeEach(function() {
-        $keepalive = create();
+        Keepalive = create();
       });
 
       afterEach(function() {
@@ -519,60 +519,60 @@ describe('ngIdle', function() {
       });
 
       it('setInterval should update an interval option', function(){
-        $keepalive.setInterval(100);
+        Keepalive.setInterval(100);
         expect(create()._options().interval).toBe(100);
       });
-      it('start() after a new LONGER timeout should NOT broadcast $keepalive when the default timeout expires', function(){
+      it('start() after a new LONGER timeout should NOT broadcast Keepalive when the default timeout expires', function(){
         spyOn($rootScope, '$broadcast');
-        $keepalive.setInterval(100*60);
-        $keepalive.start();
+        Keepalive.setInterval(100*60);
+        Keepalive.start();
         $interval.flush(DEFAULTKEEPALIVEINTERVAL);
-        expect($rootScope.$broadcast).not.toHaveBeenCalledWith('$keepalive');
+        expect($rootScope.$broadcast).not.toHaveBeenCalledWith('Keepalive');
       });
-      it('start() after a new LONGER timeout should broadcast $keepalive when the new LONGER expires', function(){
+      it('start() after a new LONGER timeout should broadcast Keepalive when the new LONGER expires', function(){
         spyOn($rootScope, '$broadcast');
-        $keepalive.setInterval(100);
-        $keepalive.start();
+        Keepalive.setInterval(100);
+        Keepalive.start();
         $interval.flush(100 * 1000);
-        expect($rootScope.$broadcast).toHaveBeenCalledWith('$keepalive');
+        expect($rootScope.$broadcast).toHaveBeenCalledWith('Keepalive');
       });
-      it('start() should schedule ping timeout that broadcasts $keepalive event when it expires.', function() {
+      it('start() should schedule ping timeout that broadcasts Keepalive event when it expires.', function() {
         spyOn($rootScope, '$broadcast');
 
-        $keepalive.start();
+        Keepalive.start();
 
         $interval.flush(DEFAULTKEEPALIVEINTERVAL);
 
-        expect($rootScope.$broadcast).toHaveBeenCalledWith('$keepalive');
+        expect($rootScope.$broadcast).toHaveBeenCalledWith('Keepalive');
       });
 
       it('stop() should cancel ping timeout.', function() {
         spyOn($rootScope, '$broadcast');
 
-        $keepalive.start();
-        $keepalive.stop();
+        Keepalive.start();
+        Keepalive.stop();
 
         $interval.flush(DEFAULTKEEPALIVEINTERVAL);
 
-        expect($rootScope.$broadcast).not.toHaveBeenCalledWith('$keepalive');
+        expect($rootScope.$broadcast).not.toHaveBeenCalledWith('Keepalive');
       });
 
-      it('ping() should immediately broadcast $keepalive event', function() {
+      it('ping() should immediately broadcast Keepalive event', function() {
         spyOn($rootScope, '$broadcast');
 
-        $keepalive.ping();
+        Keepalive.ping();
 
         $interval.flush(DEFAULTKEEPALIVEINTERVAL);
 
-        expect($rootScope.$broadcast).toHaveBeenCalledWith('$keepalive');
+        expect($rootScope.$broadcast).toHaveBeenCalledWith('Keepalive');
       });
 
-      it('should invoke a URL when pinged and broadcast $keepaliveResponse on success.', function() {
+      it('should invoke a URL when pinged and broadcast KeepaliveResponse on success.', function() {
         spyOn($rootScope, '$broadcast');
 
-        $keepalive = create('/path/to/keepalive');
+        Keepalive = create('/path/to/keepalive');
 
-        $keepalive.start();
+        Keepalive.start();
 
         $httpBackend.expectGET('/path/to/keepalive')
           .respond(200);
@@ -581,15 +581,15 @@ describe('ngIdle', function() {
 
         $httpBackend.flush();
 
-        expect($rootScope.$broadcast).toHaveBeenCalledWith('$keepaliveResponse', undefined, 200);
+        expect($rootScope.$broadcast).toHaveBeenCalledWith('KeepaliveResponse', undefined, 200);
       });
 
-      it('should invoke a URL when pinged and broadcast $keepaliveResponse on error.', function() {
+      it('should invoke a URL when pinged and broadcast KeepaliveResponse on error.', function() {
         spyOn($rootScope, '$broadcast');
 
-        $keepalive = create('/path/to/keepalive');
+        Keepalive = create('/path/to/keepalive');
 
-        $keepalive.start();
+        Keepalive.start();
 
         $httpBackend.expectGET('/path/to/keepalive')
           .respond(404);
@@ -598,7 +598,7 @@ describe('ngIdle', function() {
 
         $httpBackend.flush();
 
-        expect($rootScope.$broadcast).toHaveBeenCalledWith('$keepaliveResponse', undefined, 404);
+        expect($rootScope.$broadcast).toHaveBeenCalledWith('KeepaliveResponse', undefined, 404);
       });
     });
   });
