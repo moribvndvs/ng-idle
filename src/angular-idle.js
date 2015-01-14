@@ -1,8 +1,8 @@
 (function(window, angular, undefined) {
   'use strict';
 
-  // $keepalive service and provider
-  function $KeepaliveProvider() {
+  // Keepalive service and provider
+  function KeepaliveProvider() {
     var options = {
       http: null,
       interval: 10 * 60
@@ -37,11 +37,11 @@
 
 
       function handleResponse(data, status) {
-        $rootScope.$broadcast('$keepaliveResponse', data, status);
+        $rootScope.$broadcast('KeepaliveResponse', data, status);
       }
 
       function ping() {
-        $rootScope.$broadcast('$keepalive');
+        $rootScope.$broadcast('Keepalive');
 
         if (angular.isObject(options.http)) {
           $http(options.http)
@@ -72,10 +72,10 @@
   }
 
   angular.module('ngIdle.keepalive', [])
-    .provider('$keepalive', $KeepaliveProvider);
+    .provider('Keepalive', KeepaliveProvider);
 
-  // $idle service and provider
-  function $IdleProvider() {
+  // Idle service and provider
+  function IdleProvider() {
 
     var options = {
       idle: 20 * 60, // in seconds (default is 20min)
@@ -113,7 +113,7 @@
       options.keepalive = enabled === true;
     };
 
-    this.$get = ['$interval', '$log', '$rootScope', '$document', '$keepalive', function($interval, $log, $rootScope, $document, $keepalive) {
+    this.$get = ['$interval', '$log', '$rootScope', '$document', 'Keepalive', function($interval, $log, $rootScope, $document, Keepalive) {
       var state = {
         idle: null,
         timeout: null,
@@ -125,22 +125,22 @@
       function startKeepalive() {
         if (!options.keepalive) return;
 
-        if (state.running) $keepalive.ping();
+        if (state.running) Keepalive.ping();
 
-        $keepalive.start();
+        Keepalive.start();
       }
 
       function stopKeepalive() {
         if (!options.keepalive) return;
 
-        $keepalive.stop();
+        Keepalive.stop();
       }
 
       function toggleState() {
         state.idling = !state.idling;
         var name = state.idling ? 'Start' : 'End';
 
-        $rootScope.$broadcast('$idle' + name);
+        $rootScope.$broadcast('Idle' + name);
 
         if (state.idling) {
           stopKeepalive();
@@ -164,7 +164,7 @@
         }
 
         // countdown hasn't reached zero, so warn and decrement
-        $rootScope.$broadcast('$idleWarn', state.countdown);
+        $rootScope.$broadcast('IdleWarn', state.countdown);
         state.countdown--;
       }
 
@@ -177,7 +177,7 @@
         state.running = false;
         state.countdown = 0;
 
-        $rootScope.$broadcast('$idleTimeout');
+        $rootScope.$broadcast('IdleTimeout');
       }
 
       function changeOption(self, fn, value) {
@@ -256,27 +256,27 @@
   }
 
   angular.module('ngIdle.idle', [])
-    .provider('$idle', $IdleProvider);
+    .provider('Idle', IdleProvider);
 
-  angular.module('ngIdle.ngIdleCountdown', [])
-    .directive('ngIdleCountdown', function() {
+  angular.module('ngIdle.idleCountdown', [])
+    .directive('idleCountdown', function() {
       return {
         restrict: 'A',
         scope: {
-          value: '=ngIdleCountdown'
+          value: '=idleCountdown'
         },
         link: function($scope) {
-          $scope.$on('$idleWarn', function(e, countdown) {
+          $scope.$on('IdleWarn', function(e, countdown) {
             $scope.value = countdown;
           });
 
-          $scope.$on('$idleTimeout', function() {
+          $scope.$on('IdleTimeout', function() {
             $scope.value = 0;
           });
         }
       };
     });
 
-  angular.module('ngIdle', ['ngIdle.keepalive', 'ngIdle.idle', 'ngIdle.ngIdleCountdown']);
+  angular.module('ngIdle', ['ngIdle.keepalive', 'ngIdle.idle', 'ngIdle.idleCountdown']);
 
 })(window, window.angular);
