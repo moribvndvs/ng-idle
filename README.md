@@ -69,6 +69,10 @@ Bare bones example:
 
 You may use `Keepalive` and `Idle` independently if you desire, but they are contained in the same script.
 
+## Migrating to 1.0.0 from 0.x
+
+The following [wiki page](https://github.com/HackedByChinese/ng-idle/wiki/Migrating-to-version-1.0.0-from-0.x) details the breaking changes made in 1.0.0 and how you can migrate your application from a prior version of `ng-idle`.
+
 ## Roadmap
 
 I am interested in suggestions for new features or improvements. Please get in touch.
