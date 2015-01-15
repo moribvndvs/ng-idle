@@ -20,7 +20,7 @@ Check out the Overview in the wiki.
 
 ## Getting Started
 
-Include `angular-idle.js` after `angular.js`.
+Include `angular-idle.js` after `angular.js`. You can install using Bower with this command: `bower install --save ng-idle`.
 
 Bare bones example:
 
