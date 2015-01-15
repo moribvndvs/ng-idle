@@ -19,9 +19,9 @@ describe('ngIdle', function() {
 
     beforeEach(function() {
       angular.module('app', function() {}).config(['IdleProvider',
-        function(_IdleProvider_) {
-          IdleProvider = _IdleProvider_;
-        }
+      function(_IdleProvider_) {
+        IdleProvider = _IdleProvider_;
+      }
       ]);
 
       module('app');
@@ -313,14 +313,14 @@ describe('ngIdle', function() {
       });
 
       it ('interrupt() should call watch() if running and autoRest is true', function() {
-          spyOn(Idle, 'watch').andCallThrough();
+        spyOn(Idle, 'watch').andCallThrough();
 
-          // arrange
-          Idle.watch(); // start watching
-          Idle.watch.reset(); // reset watch spy to ignore the prior setup call
+        // arrange
+        Idle.watch(); // start watching
+        Idle.watch.reset(); // reset watch spy to ignore the prior setup call
 
-          Idle.interrupt();
-          expect(Idle.watch).toHaveBeenCalled();
+        Idle.interrupt();
+        expect(Idle.watch).toHaveBeenCalled();
       });
 
       it ('interrupt() should broadcast $timeout if running and past expiry', function() {
@@ -429,12 +429,12 @@ describe('ngIdle', function() {
 
     beforeEach(function() {
       angular
-        .module('app', function() {})
-        .config(['KeepaliveProvider',
-          function(_KeepaliveProvider_) {
-            KeepaliveProvider = _KeepaliveProvider_;
-          }
-        ]);
+      .module('app', function() {})
+      .config(['KeepaliveProvider',
+      function(_KeepaliveProvider_) {
+        KeepaliveProvider = _KeepaliveProvider_;
+      }
+      ]);
 
       module('app');
 
@@ -504,141 +504,6 @@ describe('ngIdle', function() {
           KeepaliveProvider.interval(-1);
         }).toThrow(new Error('Interval must be expressed in seconds and be greater than 0.'));
       });
-    });
-
-    describe('Keepalive', function() {
-      var Keepalive, DEFAULTKEEPALIVEINTERVAL = 10*60*1000;
-
-      beforeEach(function() {
-        Keepalive = create();
-      });
-
-      afterEach(function() {
-        $httpBackend.verifyNoOutstandingExpectation();
-        $httpBackend.verifyNoOutstandingRequest();
-      });
-
-      it('setInterval should update an interval option', function(){
-        Keepalive.setInterval(100);
-        expect(create()._options().interval).toBe(100);
-      });
-      it('start() after a new LONGER timeout should NOT broadcast Keepalive when the default timeout expires', function(){
-        spyOn($rootScope, '$broadcast');
-        Keepalive.setInterval(100*60);
-        Keepalive.start();
-        $interval.flush(DEFAULTKEEPALIVEINTERVAL);
-        expect($rootScope.$broadcast).not.toHaveBeenCalledWith('Keepalive');
-      });
-      it('start() after a new LONGER timeout should broadcast Keepalive when the new LONGER expires', function(){
-        spyOn($rootScope, '$broadcast');
-        Keepalive.setInterval(100);
-        Keepalive.start();
-        $interval.flush(100 * 1000);
-        expect($rootScope.$broadcast).toHaveBeenCalledWith('Keepalive');
-      });
-      it('start() should schedule ping timeout that broadcasts Keepalive event when it expires.', function() {
-        spyOn($rootScope, '$broadcast');
-
-        Keepalive.start();
-
-        $interval.flush(DEFAULTKEEPALIVEINTERVAL);
-
-        expect($rootScope.$broadcast).toHaveBeenCalledWith('Keepalive');
-      });
-
-      it('stop() should cancel ping timeout.', function() {
-        spyOn($rootScope, '$broadcast');
-
-        Keepalive.start();
-        Keepalive.stop();
-
-        $interval.flush(DEFAULTKEEPALIVEINTERVAL);
-
-        expect($rootScope.$broadcast).not.toHaveBeenCalledWith('Keepalive');
-      });
-
-      it('ping() should immediately broadcast Keepalive event', function() {
-        spyOn($rootScope, '$broadcast');
-
-        Keepalive.ping();
-
-        $interval.flush(DEFAULTKEEPALIVEINTERVAL);
-
-        expect($rootScope.$broadcast).toHaveBeenCalledWith('Keepalive');
-      });
-
-      it('should invoke a URL when pinged and broadcast KeepaliveResponse on success.', function() {
-        spyOn($rootScope, '$broadcast');
-
-        Keepalive = create('/path/to/keepalive');
-
-        Keepalive.start();
-
-        $httpBackend.expectGET('/path/to/keepalive')
-          .respond(200);
-
-        $interval.flush(DEFAULTKEEPALIVEINTERVAL);
-
-        $httpBackend.flush();
-
-        expect($rootScope.$broadcast).toHaveBeenCalledWith('KeepaliveResponse', undefined, 200);
-      });
-
-      it('should invoke a URL when pinged and broadcast KeepaliveResponse on error.', function() {
-        spyOn($rootScope, '$broadcast');
-
-        Keepalive = create('/path/to/keepalive');
-
-        Keepalive.start();
-
-        $httpBackend.expectGET('/path/to/keepalive')
-          .respond(404);
-
-        $interval.flush(DEFAULTKEEPALIVEINTERVAL);
-
-        $httpBackend.flush();
-
-        expect($rootScope.$broadcast).toHaveBeenCalledWith('KeepaliveResponse', undefined, 404);
-      });
-    });
-  });
-
-  describe('ng-idle-countdown', function() {
-    beforeEach(module('ngIdle', function($provide) {
-      $provide.decorator('Idle', function($delegate) {
-        return $delegate;
-      });
-    }));
-
-    var $compile, $scope, Idle, create;
-
-    beforeEach(inject(function(_$rootScope_, _$compile_, _Idle_) {
-      $scope = _$rootScope_;
-      $compile = _$compile_;
-      Idle = _Idle_;
-
-      create = function() {
-        var el = $compile(angular.element('<div idle-countdown="countdown">{{countdown}} seconds remaining.</div>'))($scope);
-        $scope.$digest();
-        return el;
-      };
-    }));
-
-    it('should update countdown scope value when receiving new IdleWarning event', function() {
-      create();
-
-      $scope.$broadcast('IdleWarn', 5);
-      $scope.$apply();
-      expect($scope.countdown).toBe(5);
-    });
-
-    it('should update countdown scope value to 0 on IdleTimeout event', function() {
-      create();
-
-      $scope.$broadcast('IdleTimeout');
-      $scope.$apply();
-
-      expect($scope.countdown).toBe(0);
     });
   });
 });
