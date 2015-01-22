@@ -270,11 +270,15 @@ angular.module('ngIdle.countdown', [])
       },
       link: function($scope) {
         $scope.$on('IdleWarn', function(e, countdown) {
-          $scope.value = countdown;
+          $scope.$apply(function() {
+            $scope.value = countdown;
+          });
         });
 
         $scope.$on('IdleTimeout', function() {
-          $scope.value = 0;
+          $scope.$apply(function() {
+            $scope.value = 0;
+          });
         });
       }
     };
