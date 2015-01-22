@@ -1,5 +1,6 @@
 <html ng-app="demo">
 	<head>
+		<title title>NgIdle Sample</title>
 		<script src="../bower_components/angular/angular.js"></script>
 		<script src="../angular-idle.min.js"></script>
 		<script type="text/javascript">
@@ -52,8 +53,8 @@
 			});
 		</script>
 	</head>
-	<body>
-		<div ng-controller="EventsCtrl" idle-countdown="countdown">
+	<body ng-controller="EventsCtrl">
+		<div idle-countdown="countdown">
 			<h1>Idle and Keepalive events</h1>
 			<button type="button" ng-click="reset()">Reset manually</button>
 			<ul>
