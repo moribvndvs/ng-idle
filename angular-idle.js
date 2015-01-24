@@ -6,30 +6,7 @@
 */
 (function(window, angular, undefined) {
 'use strict';
-angular.module('ngIdle', ['ngIdle.debounce', 'ngIdle.keepalive', 'ngIdle.idle', 'ngIdle.countdown', 'ngIdle.title']);
-angular.module('ngIdle.debounce', [])
-  .factory('Debounce', [function() {
-    var state = {};
-
-    return function(name) {
-      function debounce(fn, wait) {
-        var now = new Date().getTime();
-
-        if (now < state[name]) return;
-
-        state[name] = now + wait;
-        var context = this, args = arguments;
-        fn.apply(context, args);
-      }
-
-      debounce.flush = function() {
-        delete state[name];
-      };
-
-      return debounce;
-    };
-  }]);
-
+angular.module('ngIdle', ['ngIdle.keepalive', 'ngIdle.idle', 'ngIdle.countdown', 'ngIdle.title']);
 angular.module('ngIdle.keepalive', [])
   .provider('Keepalive', function() {
     var options = {
@@ -102,14 +79,14 @@ angular.module('ngIdle.keepalive', [])
     ];
   });
 
-angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.debounce'])
+angular.module('ngIdle.idle', ['ngIdle.keepalive'])
   .provider('Idle', function() {
     var options = {
       idle: 20 * 60, // in seconds (default is 20min)
       timeout: 30, // in seconds (default is 30sec),
       debounce: 1000, // in milliseconds (default is 1sec)
       autoResume: true, // lets events automatically resume (unsets idle state/resets warning)
-      interrupt: 'mousemove keydown DOMMouseScroll mousewheel mousedown touchstart touchmove',
+      interrupt: 'mousemove keydown DOMMouseScroll mousewheel mousedown touchstart touchmove scroll',
       keepalive: true
     };
 
@@ -145,8 +122,8 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.debounce'])
       options.debounce = ms;
     };
 
-    this.$get = ['$interval', '$log', '$rootScope', '$document', 'Keepalive', 'Debounce',
-      function($interval, $log, $rootScope, $document, Keepalive, Debounce) {
+    this.$get = ['$interval', '$log', '$rootScope', '$document', 'Keepalive',
+      function($interval, $log, $rootScope, $document, Keepalive) {
         var state = {
           idle: null,
           timeout: null,
@@ -281,7 +258,7 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.debounce'])
         };
 
         $document.find('body').on(options.interrupt, function() {
-          Debounce('interrupt')(function() { svc.interrupt(); }, options.debounce);
+          svc.interrupt();
         });
 
         return svc;

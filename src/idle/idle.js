@@ -1,4 +1,4 @@
-angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.debounce'])
+angular.module('ngIdle.idle', ['ngIdle.keepalive'])
   .provider('Idle', function() {
     var options = {
       idle: 20 * 60, // in seconds (default is 20min)
@@ -41,8 +41,8 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.debounce'])
       options.debounce = ms;
     };
 
-    this.$get = ['$interval', '$log', '$rootScope', '$document', 'Keepalive', 'Debounce',
-      function($interval, $log, $rootScope, $document, Keepalive, Debounce) {
+    this.$get = ['$interval', '$log', '$rootScope', '$document', 'Keepalive',
+      function($interval, $log, $rootScope, $document, Keepalive) {
         var state = {
           idle: null,
           timeout: null,
@@ -177,7 +177,7 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.debounce'])
         };
 
         $document.find('body').on(options.interrupt, function() {
-          Debounce('interrupt')(function() { svc.interrupt(); }, options.debounce);
+          svc.interrupt();
         });
 
         return svc;

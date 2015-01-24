@@ -15,7 +15,7 @@ module.exports = function(grunt) {
       '*/\n',
     srcHeader: '(function(window, angular, undefined) {\n' +
       '\'use strict\';\n' +
-      'angular.module(\'ngIdle\', [\'ngIdle.debounce\', \'ngIdle.keepalive\', \'ngIdle.idle\', \'ngIdle.countdown\', \'ngIdle.title\']);\n',
+      'angular.module(\'ngIdle\', [\'ngIdle.keepalive\', \'ngIdle.idle\', \'ngIdle.countdown\', \'ngIdle.title\']);\n',
     srcFooter: '\n})(window, window.angular);',
     bump: {
       options: {
@@ -46,7 +46,7 @@ module.exports = function(grunt) {
         footer: '<%= srcFooter %>'
       },
       js: {
-        src: ['src/debounce/debounce.js', 'src/keepalive/keepalive.js', 'src/idle/idle.js', 'src/countdown/countdown.js', 'src/title/title.js'],
+        src: ['src/keepalive/keepalive.js', 'src/idle/idle.js', 'src/countdown/countdown.js', 'src/title/title.js'],
         dest: 'angular-idle.js'
       }
     },
