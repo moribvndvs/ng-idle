@@ -35,6 +35,7 @@
     "browser": true,
     "element": true,
     "by": true,
-    "spyOn": true
+    "spyOn": true,
+    "jasmine": true
   }
 }
