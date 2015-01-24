@@ -5,7 +5,7 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.debounce'])
       timeout: 30, // in seconds (default is 30sec),
       debounce: 1000, // in milliseconds (default is 1sec)
       autoResume: true, // lets events automatically resume (unsets idle state/resets warning)
-      interrupt: 'mousemove keydown DOMMouseScroll mousewheel mousedown touchstart touchmove',
+      interrupt: 'mousemove keydown DOMMouseScroll mousewheel mousedown touchstart touchmove scroll',
       keepalive: true
     };
 
