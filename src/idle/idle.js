@@ -2,8 +2,7 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive'])
   .provider('Idle', function() {
     var options = {
       idle: 20 * 60, // in seconds (default is 20min)
-      timeout: 30, // in seconds (default is 30sec),
-      debounce: 1000, // in milliseconds (default is 1sec)
+      timeout: 30, // in seconds (default is 30sec)
       autoResume: true, // lets events automatically resume (unsets idle state/resets warning)
       interrupt: 'mousemove keydown DOMMouseScroll mousewheel mousedown touchstart touchmove scroll',
       keepalive: true
@@ -35,10 +34,6 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive'])
 
     this.keepalive = function(enabled) {
       options.keepalive = enabled === true;
-    };
-
-    this.debounce = function(ms) {
-      options.debounce = ms;
     };
 
     this.$get = ['$interval', '$log', '$rootScope', '$document', 'Keepalive',
