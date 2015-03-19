@@ -84,7 +84,7 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
     var options = {
       idle: 20 * 60, // in seconds (default is 20min)
       timeout: 30, // in seconds (default is 30sec)
-      autoResume: true, // lets events automatically resume (unsets idle state/resets warning)
+      autoResume: 'idle', // lets events automatically resume (unsets idle state/resets warning)
       interrupt: 'mousemove keydown DOMMouseScroll mousewheel mousedown touchstart touchmove scroll',
       keepalive: true
     };
@@ -110,7 +110,9 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
     };
 
     this.autoResume = function(value) {
-      options.autoResume = value === true;
+      if (value === true) options.autoResume = 'idle';
+      else if (value === false) options.autoResume = 'off';
+      else options.autoResume = value;
     };
 
     this.keepalive = function(enabled) {
@@ -258,7 +260,7 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
             }
 
             // note: you can no longer auto resume once we exceed the expiry; you will reset state by calling watch() manually
-            if (options.autoResume) this.watch();
+            if (options.autoResume === 'idle' || (options.autoResume === 'notIdle' && !state.idling)) this.watch();
           }
         };
 
