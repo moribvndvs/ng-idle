@@ -56,6 +56,7 @@ angular.module('ngIdle.title', [])
   }])
   .directive('title', ['Title', function(Title) {
       return {
+        restrict: 'E',
         link: function($scope, $element, $attr) {
           if ($attr.idleDisabled) return;
 

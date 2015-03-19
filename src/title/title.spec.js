@@ -117,7 +117,7 @@ describe('ngIdle', function() {
       spyOn(Title, 'store');
 
       create = function(template) {
-        var el = $compile(angular.element(template||'<div title>Hello World</div>'))($scope);
+        var el = $compile(angular.element(template||'<title>Hello World</title>'))($scope);
         $scope.$digest();
         return el;
       };
