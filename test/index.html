@@ -1,57 +1,74 @@
 <html ng-app="demo">
 	<head>
+		<title title>NgIdle Sample</title>
 		<script src="../bower_components/angular/angular.js"></script>
 		<script src="../angular-idle.min.js"></script>
 		<script type="text/javascript">
 			var app = angular.module('demo', ['ngIdle']);
 			app
-			.controller('EventsCtrl', function($scope, $idle) {
+			.controller('EventsCtrl', function($scope, Idle) {
 				$scope.events = [];
+				$scope.idle = 5;
+				$scope.timeout = 5;
 
-				$scope.$on('$idleStart', function() {
-					$scope.events.push({event: '$idleStart', date: new Date()});
+				$scope.$on('IdleStart', function() {
+					$scope.events.push({event: 'IdleStart', date: new Date()});
 				});
 
-				$scope.$on('$idleEnd', function() {
-					// not sure why we need $apply here but not the others
-					$scope.$apply(function() {
-						$scope.events.push({event: '$idleEnd', date: new Date()});
-					});
-
+				$scope.$on('IdleEnd', function() {
+					$scope.events.push({event: 'IdleEnd', date: new Date()});
 				});
 
-				$scope.$on('$idleWarn', function(e, countdown) {
-					$scope.events.push({event: '$idleWarn', date: new Date(), countdown: countdown});
+				$scope.$on('IdleWarn', function(e, countdown) {
+					$scope.events.push({event: 'IdleWarn', date: new Date(), countdown: countdown});
 				});
 
-				$scope.$on('$idleTimeout', function() {
-					$scope.events.push({event: '$idleTimeout', date: new Date()});
+				$scope.$on('IdleTimeout', function() {
+					$scope.events.push({event: 'IdleTimeout', date: new Date()});
 				});
 
-				$scope.$on('$keepalive', function() {
-					$scope.events.push({event: '$keepalive', date: new Date()});
-				})
+				$scope.$on('Keepalive', function() {
+					$scope.events.push({event: 'Keepalive', date: new Date()});
+				});
+
+				$scope.reset = function() {
+					Idle.watch();
+				}
+
+				$scope.$watch('idle', function(value) {
+					if (value !== null) Idle.setIdle(value);
+				});
+
+				$scope.$watch('timeout', function(value) {
+					if (value !== null) Idle.setTimeout(value);
+				});
 			})
-			.config(function($idleProvider, $keepaliveProvider) {
-				$idleProvider.idleDuration(5);
-				$idleProvider.warningDuration(5);
-				$keepaliveProvider.interval(10);
+			.config(function(IdleProvider, KeepaliveProvider) {
+				KeepaliveProvider.interval(10);
 			})
-			.run(function($rootScope, $idle, $log, $keepalive){
-				$idle.watch();
+			.run(function($rootScope, Idle, $log, Keepalive){
+				Idle.watch();
 
 				$log.debug('app started.');
 			});
 		</script>
 	</head>
-	<body>
-		<div ng-controller="EventsCtrl" ng-idle-countdown="countdown">
-			<h1>$idle and $keepalive events</h1>
+	<body ng-controller="EventsCtrl">
+		<div idle-countdown="countdown">
+			<h1>Idle and Keepalive events</h1>
+			<button type="button" ng-click="reset()">Reset manually</button>
 			<ul>
 				<li ng-repeat="event in events">{{event}}</li>
 			</ul>
 
 			Timeout in {{countdown}} seconds.
+
+			<div>
+				Change idle value <input type="number" ng-model="idle" />
+			</div>
+			<div>
+				Change timeout value <input type="number" ng-model="timeout" />
+			</div>
 		</div>
 	</body>
 </html>
