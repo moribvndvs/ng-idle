@@ -11,7 +11,7 @@ describe('ngIdle', function() {
   });
 
   describe('idle', function() {
-    var IdleProvider, $interval, $rootScope, $log, $document, Keepalive, $injector;
+    var IdleProvider, $interval, $rootScope, $log, $document, Keepalive, $injector, LocalStorage;
     var DEFAULTIDLEDURATION = 20*60*1000, DEFAULTTIMEOUT = 30 * 1000;
 
     beforeEach(module('ngIdle.idle'));
@@ -26,12 +26,13 @@ describe('ngIdle', function() {
 
       module('app');
 
-      inject(function(_$interval_, _$log_, _$rootScope_, _$document_, _$injector_) {
+      inject(function(_$interval_, _$log_, _$rootScope_, _$document_, _$injector_, _LocalStorage_) {
         $rootScope = _$rootScope_;
         $interval = _$interval_;
         $log = _$log_;
         $document = _$document_;
         $injector = _$injector_;
+        LocalStorage = _LocalStorage_;
       });
 
       Keepalive = {
@@ -47,7 +48,7 @@ describe('ngIdle', function() {
 
     var create = function(keepalive) {
       if (angular.isDefined(keepalive)) IdleProvider.keepalive(keepalive);
-      return $injector.invoke(IdleProvider.$get, null, {$interval: $interval, $log: $log, $rootScope: $rootScope, $document: $document, Keepalive: Keepalive});
+      return $injector.invoke(IdleProvider.$get, null, {$interval: $interval, $log: $log, $rootScope: $rootScope, $document: $document, Keepalive: Keepalive, LocalStorage:LocalStorage});
     };
 
     describe('IdleProvider', function() {
@@ -130,8 +131,10 @@ describe('ngIdle', function() {
       var Idle;
 
       beforeEach(function() {
+        LocalStorage.remove('expiry');
         IdleProvider.timeout(3);
         Idle = create();
+
       });
 
       it ('setIdle() should update option.idle and restart', function() {

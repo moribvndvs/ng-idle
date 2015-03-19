@@ -15,7 +15,7 @@ module.exports = function(grunt) {
       '*/\n',
     srcHeader: '(function(window, angular, undefined) {\n' +
       '\'use strict\';\n' +
-      'angular.module(\'ngIdle\', [\'ngIdle.keepalive\', \'ngIdle.idle\', \'ngIdle.countdown\', \'ngIdle.title\']);\n',
+      'angular.module(\'ngIdle\', [\'ngIdle.keepalive\', \'ngIdle.idle\', \'ngIdle.countdown\', \'ngIdle.title\', \'ngIdle.localStorage\']);\n',
     srcFooter: '\n})(window, window.angular);',
     bump: {
       options: {
@@ -46,7 +46,7 @@ module.exports = function(grunt) {
         footer: '<%= srcFooter %>'
       },
       js: {
-        src: ['src/keepalive/keepalive.js', 'src/idle/idle.js', 'src/countdown/countdown.js', 'src/title/title.js'],
+        src: ['src/keepalive/keepalive.js', 'src/idle/idle.js', 'src/countdown/countdown.js', 'src/title/title.js', 'src/localStorage/localStorage.js'],
         dest: 'angular-idle.js'
       }
     },
@@ -60,10 +60,20 @@ module.exports = function(grunt) {
           sourceMapName: 'angular-idle.map'
         }
       }
+    },
+    connect: {
+      server: {
+        options: {
+          port: 9001,
+          base: './',
+          keepalive: true
+        }
+      }
     }
   });
 
   grunt.registerTask('test', ['karma:unit']);
   grunt.registerTask('test-server', ['karma:server']);
   grunt.registerTask('build', ['clean', 'concat:js', 'uglify']);
+  grunt.registerTask('sample', ['connect'])
 };

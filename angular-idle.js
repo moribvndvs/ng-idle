@@ -6,7 +6,7 @@
 */
 (function(window, angular, undefined) {
 'use strict';
-angular.module('ngIdle', ['ngIdle.keepalive', 'ngIdle.idle', 'ngIdle.countdown', 'ngIdle.title']);
+angular.module('ngIdle', ['ngIdle.keepalive', 'ngIdle.idle', 'ngIdle.countdown', 'ngIdle.title', 'ngIdle.localStorage']);
 angular.module('ngIdle.keepalive', [])
   .provider('Keepalive', function() {
     var options = {
@@ -79,7 +79,7 @@ angular.module('ngIdle.keepalive', [])
     ];
   });
 
-angular.module('ngIdle.idle', ['ngIdle.keepalive'])
+angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
   .provider('Idle', function() {
     var options = {
       idle: 20 * 60, // in seconds (default is 20min)
@@ -117,8 +117,8 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive'])
       options.keepalive = enabled === true;
     };
 
-    this.$get = ['$interval', '$log', '$rootScope', '$document', 'Keepalive',
-      function($interval, $log, $rootScope, $document, Keepalive) {
+    this.$get = ['$interval', '$log', '$rootScope', '$document', 'Keepalive', 'LocalStorage', '$window',
+      function($interval, $log, $rootScope, $document, Keepalive, LocalStorage, $window) {
         var state = {
           idle: null,
           timeout: null,
@@ -193,6 +193,15 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive'])
           if (reset) self.watch();
         }
 
+        function getExpiry() {
+          return LocalStorage.get('expiry');
+        }
+
+        function setExpiry(date) {
+          if (!date) LocalStorage.remove('expiry');
+          else LocalStorage.set('expiry', date);
+        }
+
         var svc = {
           _options: function() {
             return options;
@@ -207,7 +216,8 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive'])
             changeOption(this, setTimeout, seconds);
           },
           isExpired: function() {
-            return state.expiry && state.expiry <= this._getNow();
+            var expiry = getExpiry();
+            return expiry && expiry <= this._getNow();
           },
           running: function() {
             return state.running;
@@ -221,7 +231,7 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive'])
 
             // calculate the absolute expiry date, as added insurance against a browser sleeping or paused in the background
             var timeout = !options.timeout ? 0 : options.timeout;
-            state.expiry = new Date(new Date().getTime() + ((options.idle + timeout) * 1000));
+            setExpiry(new Date(new Date().getTime() + ((options.idle + timeout) * 1000)));
 
 
             if (state.idling) toggleState(); // clears the idle state if currently idling
@@ -237,7 +247,7 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive'])
 
             state.idling = false;
             state.running = false;
-            state.expiry = null;
+            setExpiry(null);
           },
           interrupt: function() {
             if (!state.running) return;
@@ -255,6 +265,13 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive'])
         $document.find('body').on(options.interrupt, function() {
           svc.interrupt();
         });
+
+        var wrap = function(event) {
+          if (event.key === 'ngIdle.expiry') svc.interrupt();
+        };
+
+        if ($window.addEventListener) $window.addEventListener('storage', wrap, false);
+        else $window.attachEvent('onstorage', wrap);
 
         return svc;
       }
@@ -360,6 +377,38 @@ angular.module('ngIdle.title', [])
           });
         }
       };
+  }]);
+
+angular.module('ngIdle.localStorage', [])
+  .factory('LocalStorage', ['$window', function($window) {
+    var storage = $window.localStorage;
+
+    function tryParseJson(value) {
+      try {
+        return JSON.parse(value, function(key, value) {
+          var match = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2}(?:\.\d*)?)Z$/.exec(value);
+          if (match) return new Date(value);
+
+          return value;
+        });
+      }
+      catch(e) {
+        return value;
+      }
+    }
+
+    return {
+      set: function(key, value) {
+        storage.setItem('ngIdle.'+key, JSON.stringify(value));
+      },
+      get: function(key) {
+        var raw = storage.getItem('ngIdle.'+key);
+        return tryParseJson(raw);
+      },
+      remove: function(key) {
+        storage.removeItem('ngIdle.'+key);
+      }
+    };
   }]);
 
 })(window, window.angular);
