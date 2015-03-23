@@ -1,7 +1,7 @@
 (function(window, angular, undefined) {
 	'use strict';
 	angular.module('demo', ['ngIdle', 'ui.bootstrap'])
-		.controller('DemoCtrl', function($scope, $idle, $keepalive, $modal){
+		.controller('DemoCtrl', function($scope, Idle, Keepalive, $modal){
 			$scope.started = false;
 
 			function closeModals() {
@@ -16,7 +16,7 @@
 				}
 			}
 
-			$scope.$on('$idleStart', function() {
+			$scope.$on('IdleStart', function() {
 				closeModals();
 
 				$scope.warning = $modal.open({
@@ -25,11 +25,11 @@
 				});
 			});
 
-			$scope.$on('$idleEnd', function() {
+			$scope.$on('IdleEnd', function() {
 				closeModals();
 			});
 
-			$scope.$on('$idleTimeout', function() {
+			$scope.$on('IdleTimeout', function() {
 				closeModals();
 				$scope.timedout = $modal.open({
 					templateUrl: 'timedout-dialog.html',
@@ -39,21 +39,21 @@
 
 			$scope.start = function() {
 				closeModals();
-				$idle.watch();
+				Idle.watch();
 				$scope.started = true;
 			};
 
 			$scope.stop = function() {
 				closeModals();
-				$idle.unwatch();
+				Idle.unwatch();
 				$scope.started = false;
 
 			};
 		})
-		.config(function($idleProvider, $keepaliveProvider) {
-			$idleProvider.idleDuration(5);
-            $idleProvider.warningDuration(5);
-            $keepaliveProvider.interval(10);
+		.config(function(IdleProvider, KeepaliveProvider) {
+			IdleProvider.idle(5);
+			IdleProvider.timeout(5);
+			KeepaliveProvider.interval(10);
 		});
-	
+
 })(window, window.angular);
