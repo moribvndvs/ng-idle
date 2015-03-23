@@ -26,14 +26,14 @@ describe('ngIdle', function() {
 
       module('app');
 
-      inject(function(_$interval_, _$log_, _$rootScope_, _$document_, _$injector_, _LocalStorage_) {
+      inject(['$interval', '$log', '$rootScope', '$document', '$injector', 'ngIdle.LocalStorage', function(_$interval_, _$log_, _$rootScope_, _$document_, _$injector_, _LocalStorage_) {
         $rootScope = _$rootScope_;
         $interval = _$interval_;
         $log = _$log_;
         $document = _$document_;
         $injector = _$injector_;
         LocalStorage = _LocalStorage_;
-      });
+      }]);
 
       Keepalive = {
         start: function() {},
