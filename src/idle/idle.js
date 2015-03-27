@@ -38,7 +38,7 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
       options.keepalive = enabled === true;
     };
 
-    this.$get = ['$interval', '$log', '$rootScope', '$document', 'Keepalive', 'LocalStorage', '$window',
+    this.$get = ['$interval', '$log', '$rootScope', '$document', 'Keepalive', 'IdleLocalStorage', '$window',
       function($interval, $log, $rootScope, $document, Keepalive, LocalStorage, $window) {
         var state = {
           idle: null,
@@ -169,6 +169,8 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
             state.idling = false;
             state.running = false;
             setExpiry(null);
+
+            stopKeepalive();
           },
           interrupt: function() {
             if (!state.running) return;

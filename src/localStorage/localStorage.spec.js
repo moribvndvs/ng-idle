@@ -18,12 +18,12 @@ describe('ngIdle', function() {
     });
 
     var $window, LocalStorage;
-    beforeEach(inject(function(_$window_, _LocalStorage_) {
+    beforeEach(inject(['$window', 'IdleLocalStorage', function(_$window_, _LocalStorage_) {
       $window = _$window_;
       LocalStorage = _LocalStorage_;
 
       spyOn($window.localStorage, 'setItem').andCallThrough();
-    }));
+    }]));
 
     it ('set() should set value', function() {
       LocalStorage.set('key', 1);
@@ -46,7 +46,7 @@ describe('ngIdle', function() {
       var expected = new Date();
       var raw = JSON.stringify(expected);
       spyOn($window.localStorage, 'getItem').andReturn(raw);
-      
+
       var actual = LocalStorage.get('key');
       expect(actual).toEqual(expected);
     });

@@ -1,5 +1,5 @@
 angular.module('ngIdle.localStorage', [])
-  .factory('LocalStorage', ['$window', function($window) {
+  .factory('IdleLocalStorage', ['$window', function($window) {
     var storage = $window.localStorage;
 
     function tryParseJson(value) {
