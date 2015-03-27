@@ -26,7 +26,7 @@ describe('ngIdle', function() {
 
       module('app');
 
-      inject(['$interval', '$log', '$rootScope', '$document', '$injector', 'ngIdle.LocalStorage', function(_$interval_, _$log_, _$rootScope_, _$document_, _$injector_, _LocalStorage_) {
+      inject(['$interval', '$log', '$rootScope', '$document', '$injector', 'IdleLocalStorage', function(_$interval_, _$log_, _$rootScope_, _$document_, _$injector_, _LocalStorage_) {
         $rootScope = _$rootScope_;
         $interval = _$interval_;
         $log = _$log_;

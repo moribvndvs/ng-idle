@@ -75,5 +75,5 @@ module.exports = function(grunt) {
   grunt.registerTask('test', ['karma:unit']);
   grunt.registerTask('test-server', ['karma:server']);
   grunt.registerTask('build', ['clean', 'concat:js', 'uglify']);
-  grunt.registerTask('sample', ['connect'])
+  grunt.registerTask('sample', ['connect']);
 };

@@ -18,7 +18,7 @@ describe('ngIdle', function() {
     });
 
     var $window, LocalStorage;
-    beforeEach(inject(['$window', 'ngIdle.LocalStorage', function(_$window_, _LocalStorage_) {
+    beforeEach(inject(['$window', 'IdleLocalStorage', function(_$window_, _LocalStorage_) {
       $window = _$window_;
       LocalStorage = _LocalStorage_;
 

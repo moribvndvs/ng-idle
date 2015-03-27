@@ -119,7 +119,7 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
       options.keepalive = enabled === true;
     };
 
-    this.$get = ['$interval', '$log', '$rootScope', '$document', 'Keepalive', 'ngIdle.LocalStorage', '$window',
+    this.$get = ['$interval', '$log', '$rootScope', '$document', 'Keepalive', 'IdleLocalStorage', '$window',
       function($interval, $log, $rootScope, $document, Keepalive, LocalStorage, $window) {
         var state = {
           idle: null,
@@ -383,7 +383,7 @@ angular.module('ngIdle.title', [])
   }]);
 
 angular.module('ngIdle.localStorage', [])
-  .factory('ngIdle.LocalStorage', ['$window', function($window) {
+  .factory('IdleLocalStorage', ['$window', function($window) {
     var storage = $window.localStorage;
 
     function tryParseJson(value) {
