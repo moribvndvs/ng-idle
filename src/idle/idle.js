@@ -169,6 +169,8 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
             state.idling = false;
             state.running = false;
             setExpiry(null);
+
+            stopKeepalive();
           },
           interrupt: function() {
             if (!state.running) return;

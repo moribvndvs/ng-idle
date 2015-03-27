@@ -219,6 +219,14 @@ describe('ngIdle', function() {
         expect(Idle.running()).toBe(false);
       });
 
+      it('unwatch() should stop keepalive if enabled', function() {
+        Idle.watch();
+
+        Idle.unwatch();
+
+        expect(Keepalive.stop).toHaveBeenCalled();
+      });
+
       it('should broadcast IdleStart and stop keepalive', function() {
         spyOn($rootScope, '$broadcast');
 
