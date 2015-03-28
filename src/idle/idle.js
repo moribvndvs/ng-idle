@@ -48,6 +48,8 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
           countdown: null
         };
 
+        var id = new Date().getTime();
+
         function startKeepalive() {
           if (!options.keepalive) return;
 
@@ -115,12 +117,14 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
         }
 
         function getExpiry() {
-          return LocalStorage.get('expiry');
+          var obj = LocalStorage.get('expiry');
+
+          return obj.time;
         }
 
         function setExpiry(date) {
           if (!date) LocalStorage.remove('expiry');
-          else LocalStorage.set('expiry', date);
+          else LocalStorage.set('expiry', {id: id, time: date});
         }
 
         var svc = {
@@ -146,13 +150,13 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
           idling: function() {
             return state.idling;
           },
-          watch: function() {
+          watch: function(noExpiryUpdate) {
             $interval.cancel(state.idle);
             $interval.cancel(state.timeout);
 
             // calculate the absolute expiry date, as added insurance against a browser sleeping or paused in the background
             var timeout = !options.timeout ? 0 : options.timeout;
-            setExpiry(new Date(new Date().getTime() + ((options.idle + timeout) * 1000)));
+            if (!noExpiryUpdate) setExpiry(new Date(new Date().getTime() + ((options.idle + timeout) * 1000)));
 
 
             if (state.idling) toggleState(); // clears the idle state if currently idling
@@ -172,7 +176,7 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
 
             stopKeepalive();
           },
-          interrupt: function() {
+          interrupt: function(noExpiryUpdate) {
             if (!state.running) return;
 
             if (options.timeout && this.isExpired()) {
@@ -181,7 +185,7 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
             }
 
             // note: you can no longer auto resume once we exceed the expiry; you will reset state by calling watch() manually
-            if (options.autoResume === 'idle' || (options.autoResume === 'notIdle' && !state.idling)) this.watch();
+            if (options.autoResume === 'idle' || (options.autoResume === 'notIdle' && !state.idling)) this.watch(noExpiryUpdate);
           }
         };
 
@@ -190,7 +194,11 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
         });
 
         var wrap = function(event) {
-          if (event.key === 'ngIdle.expiry') svc.interrupt();
+          if (event.key === 'ngIdle.expiry' && event.newValue !== event.oldValue) {
+            var val = LocalStorage.parseJson(event.newValue);
+            if (val.id === id) return;
+            svc.interrupt(true);
+          }
         };
 
         if ($window.addEventListener) $window.addEventListener('storage', wrap, false);

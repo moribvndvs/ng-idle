@@ -354,6 +354,24 @@ describe('ngIdle', function() {
         expect(Idle.watch).not.toHaveBeenCalled();
       });
 
+      it ('interrupt(true) should not update expiry', function() {
+        Idle.watch();
+
+        spyOn(LocalStorage, 'set').andCallThrough();
+        Idle.interrupt(true);
+
+        expect(LocalStorage.set).not.toHaveBeenCalled();
+      });
+
+      it ('interrupt() should update expiry', function() {
+        Idle.watch();
+
+        spyOn(LocalStorage, 'set').andCallThrough();
+        Idle.interrupt();
+
+        expect(LocalStorage.set).toHaveBeenCalled();
+      });
+
       // HACK: the body event listener is only respected the first time, and thus always checks the first Idle instance we created rather than the one we created last.
       // in practice, the functionality works fine, but here the test always fails. dunno how to fix it right now.
       // it ('document event should interrupt idle timeout', function() {
