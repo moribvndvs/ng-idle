@@ -36,21 +36,6 @@ describe('ngIdle', function() {
       expect(actual).toEqualData({value:1});
     });
 
-    it ('get() should retrieve value as string', function() {
-      spyOn($window.localStorage, 'getItem').andReturn('test');
-      var actual = LocalStorage.get('key');
-      expect(actual).toEqualData('test');
-    });
-
-    it ('get() should retrieve value as date', function() {
-      var expected = new Date();
-      var raw = JSON.stringify(expected);
-      spyOn($window.localStorage, 'getItem').andReturn(raw);
-
-      var actual = LocalStorage.get('key');
-      expect(actual).toEqual(expected);
-    });
-
     it ('remove() should remove key/value', function() {
       spyOn($window.localStorage, 'removeItem');
       LocalStorage.remove('key');

@@ -119,7 +119,7 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
         function getExpiry() {
           var obj = LocalStorage.get('expiry');
 
-          return obj.time;
+          return new Date(obj.time);
         }
 
         function setExpiry(date) {
@@ -195,7 +195,7 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
 
         var wrap = function(event) {
           if (event.key === 'ngIdle.expiry' && event.newValue !== event.oldValue) {
-            var val = LocalStorage.parseJson(event.newValue);
+            var val = angular.fromJson(event.newValue);
             if (val.id === id) return;
             svc.interrupt(true);
           }
