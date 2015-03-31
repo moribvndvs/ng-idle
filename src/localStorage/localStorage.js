@@ -11,9 +11,6 @@ angular.module('ngIdle.localStorage', [])
       },
       remove: function(key) {
         storage.removeItem('ngIdle.'+key);
-      },
-      parseJson: function(raw) {
-        return angular.fromJson(raw);
       }
     };
   }]);
