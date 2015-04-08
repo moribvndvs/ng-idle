@@ -13,10 +13,14 @@ Authored by Mike Grabski @HackedByChinese <me@mikegrabski.com>
 Licensed under [MIT](http://www.opensource.org/licenses/mit-license.php)
 
 ## Requirements
-* Angular 1.2.0 or later (earlier might be possible but not tested).
+* Angular 1.2.0 or later. 
 
 ## What NgIdle Does
 Check out the Overview in the wiki.
+
+## Getting Help / "How do I..."
+
+I know a lot of GH projects give you the basics on the README and don't bother with a wiki. I assure you [our wiki is fully operational](https://github.com/HackedByChinese/ng-idle/wiki) and documents the full API. Before opening an issue asking me how to do something, please stop by the wiki first; I'll probably just end up linking you to your answer in the wiki anyways :wink:.
 
 ## Getting Started
 
@@ -24,48 +28,48 @@ Include `angular-idle.js` after `angular.js`. You can install using Bower with t
 
 Bare bones example:
 
-			// include the `ngIdle` module
-			var app = angular.module('demo', ['ngIdle']);
+	// include the `ngIdle` module
+	var app = angular.module('demo', ['ngIdle']);
 
-			app
-			.controller('EventsCtrl', function($scope, Idle) {
-				$scope.events = [];
+	app
+	.controller('EventsCtrl', function($scope, Idle) {
+		$scope.events = [];
 
-				$scope.$on('IdleStart', function() {
-					// the user appears to have gone idle
-				});
+		$scope.$on('IdleStart', function() {
+			// the user appears to have gone idle
+		});
 
-				$scope.$on('IdleWarn', function(e, countdown) {
-					// follows after the IdleStart event, but includes a countdown until the user is considered timed out
-					// the countdown arg is the number of seconds remaining until then.
-					// you can change the title or display a warning dialog from here.
-					// you can let them resume their session by calling Idle.watch()
-				});
+		$scope.$on('IdleWarn', function(e, countdown) {
+			// follows after the IdleStart event, but includes a countdown until the user is considered timed out
+			// the countdown arg is the number of seconds remaining until then.
+			// you can change the title or display a warning dialog from here.
+			// you can let them resume their session by calling Idle.watch()
+		});
 
-				$scope.$on('IdleTimeout', function() {
-					// the user has timed out (meaning idleDuration + timeout has passed without any activity)
-					// this is where you'd log them
-				});
+		$scope.$on('IdleTimeout', function() {
+			// the user has timed out (meaning idleDuration + timeout has passed without any activity)
+			// this is where you'd log them
+		});
 
-				$scope.$on('IdleEnd', function() {
-					// the user has come back from AFK and is doing stuff. if you are warning them, you can use this to hide the dialog
-				});
+		$scope.$on('IdleEnd', function() {
+			// the user has come back from AFK and is doing stuff. if you are warning them, you can use this to hide the dialog
+		});
 
-				$scope.$on('Keepalive', function() {
-					// do something to keep the user's session alive
-				});
+		$scope.$on('Keepalive', function() {
+			// do something to keep the user's session alive
+		});
 
-			})
-			.config(function(IdleProvider, KeepaliveProvider) {
-				// configure Idle settings
-				IdleProvider.idle(5); // in seconds
-				IdleProvider.timeout(5); // in seconds
-				KeepaliveProvider.interval(2); // in seconds
-			})
-			.run(function(Idle){
-				// start watching when the app runs. also starts the Keepalive service by default.
-				Idle.watch();
-			});
+	})
+	.config(function(IdleProvider, KeepaliveProvider) {
+		// configure Idle settings
+		IdleProvider.idle(5); // in seconds
+		IdleProvider.timeout(5); // in seconds
+		KeepaliveProvider.interval(2); // in seconds
+	})
+	.run(function(Idle){
+		// start watching when the app runs. also starts the Keepalive service by default.
+		Idle.watch();
+	});
 
 You may use `Keepalive` and `Idle` independently if you desire, but they are contained in the same script.
 
