@@ -1,6 +1,6 @@
 /*** Directives and services for responding to idle users in AngularJS
 * @author Mike Grabski <me@mikegrabski.com>
-* @version v1.0.2
+* @version v1.0.3
 * @link https://github.com/HackedByChinese/ng-idle.git
 * @license MIT
 */
@@ -200,7 +200,7 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
         function getExpiry() {
           var obj = LocalStorage.get('expiry');
 
-          return obj.time;
+          return new Date(obj.time);
         }
 
         function setExpiry(date) {
@@ -276,7 +276,7 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
 
         var wrap = function(event) {
           if (event.key === 'ngIdle.expiry' && event.newValue !== event.oldValue) {
-            var val = LocalStorage.parseJson(event.newValue);
+            var val = angular.fromJson(event.newValue);
             if (val.id === id) return;
             svc.interrupt(true);
           }
@@ -393,36 +393,18 @@ angular.module('ngIdle.title', [])
   }]);
 
 angular.module('ngIdle.localStorage', [])
-  .factory('IdleLocalStorage', ['$window', function($window) {
+  .service('IdleLocalStorage', ['$window', function($window) {
     var storage = $window.localStorage;
-
-    function tryParseJson(value) {
-      try {
-        return JSON.parse(value, function(key, value) {
-          var match = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2}(?:\.\d*)?)Z$/.exec(value);
-          if (match) return new Date(value);
-
-          return value;
-        });
-      }
-      catch(e) {
-        return value;
-      }
-    }
-
+    
     return {
       set: function(key, value) {
-        storage.setItem('ngIdle.'+key, JSON.stringify(value));
+        storage.setItem('ngIdle.'+key, angular.toJson(value));
       },
       get: function(key) {
-        var raw = storage.getItem('ngIdle.'+key);
-        return tryParseJson(raw);
+        return angular.fromJson(storage.getItem('ngIdle.'+key));
       },
       remove: function(key) {
         storage.removeItem('ngIdle.'+key);
-      },
-      parseJson: function(raw) {
-        return tryParseJson(raw);
       }
     };
   }]);

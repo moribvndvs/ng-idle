@@ -13,7 +13,7 @@ Authored by Mike Grabski @HackedByChinese <me@mikegrabski.com>
 Licensed under [MIT](http://www.opensource.org/licenses/mit-license.php)
 
 ## Requirements
-* Angular 1.2.0 or later. 
+* Angular 1.2.0 or later.
 
 ## What NgIdle Does
 Check out the Overview in the wiki.
@@ -87,7 +87,7 @@ Contributors are welcome. I use the `git-flow` lifecyle, so `master` is the stab
 
 ## Developing
 
-You will need Node/NPM, Grunt, and Bower. Once you checkout from git, run `npm install`. This will install all dev and bower dependencies so you can immediately build and test your working copy.
+You will need Node/NPM and Grunt (don't forget `grunt-cli`). Once you checkout from git, run `npm install`. This will install all dev and bower dependencies so you can immediately build and test your working copy.
 
 ### Building
 You can build the module by running `grunt build`.
