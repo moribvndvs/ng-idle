@@ -158,6 +158,16 @@ describe('ngIdle', function() {
         expect(Idle.watch).toHaveBeenCalled();
       });
 
+      it ('getIdle() should return the current idle value', function(){
+        Idle.setIdle(100);
+        expect(Idle.getIdle()).toBe(100);
+      });
+
+      it ('getTimeout() should return the current timeout value', function(){
+        Idle.setTimeout(100);
+        expect(Idle.getTimeout()).toBe(100);
+      });
+
       it ('setTimeout() should update option.timeout and restart', function() {
         spyOn(Idle, 'watch');
         spyOn(Idle, 'unwatch');
@@ -376,15 +386,15 @@ describe('ngIdle', function() {
       // in practice, the functionality works fine, but here the test always fails. dunno how to fix it right now.
       // it ('document event should interrupt idle timeout', function() {
 
-      // 	Idle.watch();
-      // 	$timeout.flush();
+      //   Idle.watch();
+      //   $timeout.flush();
 
-      // 	expect(Idle.idling()).toBe(true);
+      //   expect(Idle.idling()).toBe(true);
 
-      // 	var e = $.Event('click');
-      // 	$('body').trigger(e);
+      //   var e = $.Event('click');
+      //   $('body').trigger(e);
 
-      // 	expect(Idle.idling()).toBe(false);
+      //   expect(Idle.idling()).toBe(false);
       // });
     });
 

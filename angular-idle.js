@@ -42,7 +42,6 @@ angular.module('ngIdle.keepalive', [])
           ping: null
         };
 
-
         function handleResponse(data, status) {
           $rootScope.$broadcast('KeepaliveResponse', data, status);
         }
@@ -214,6 +213,12 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
           },
           _getNow: function() {
             return new Date();
+          },
+          getIdle: function(){
+            return options.idle;
+          },
+          getTimeout: function(){
+            return options.timeout;
           },
           setIdle: function(seconds) {
             changeOption(this, setIdle, seconds);
