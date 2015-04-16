@@ -134,6 +134,12 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
           _getNow: function() {
             return new Date();
           },
+          getIdle: function(){
+            return options.idle;
+          },
+          getTimeout: function(){
+            return options.timeout;
+          },
           setIdle: function(seconds) {
             changeOption(this, setIdle, seconds);
           },
