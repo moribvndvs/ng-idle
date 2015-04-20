@@ -42,7 +42,6 @@ angular.module('ngIdle.keepalive', [])
           ping: null
         };
 
-
         function handleResponse(data, status) {
           $rootScope.$broadcast('KeepaliveResponse', data, status);
         }
@@ -215,6 +214,12 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
           _getNow: function() {
             return new Date();
           },
+          getIdle: function(){
+            return options.idle;
+          },
+          getTimeout: function(){
+            return options.timeout;
+          },
           setIdle: function(seconds) {
             changeOption(this, setIdle, seconds);
           },
@@ -290,7 +295,7 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
     ];
   });
 
-angular.module('ngIdle.countdown', [])
+angular.module('ngIdle.countdown', ['ngIdle.idle'])
   .directive('idleCountdown', ['Idle', function(Idle) {
     return {
       restrict: 'A',
@@ -379,6 +384,10 @@ angular.module('ngIdle.title', [])
           if ($attr.idleDisabled) return;
 
           Title.store(true);
+
+          $scope.$on('IdleStart', function(e) {
+            Title.original($element[0].innerText);
+          });
 
           $scope.$on('IdleWarn', function(e, countdown) {
             Title.setAsIdle(countdown);

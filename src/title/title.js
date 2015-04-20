@@ -62,6 +62,10 @@ angular.module('ngIdle.title', [])
 
           Title.store(true);
 
+          $scope.$on('IdleStart', function(e) {
+            Title.original($element[0].innerText);
+          });
+
           $scope.$on('IdleWarn', function(e, countdown) {
             Title.setAsIdle(countdown);
           });

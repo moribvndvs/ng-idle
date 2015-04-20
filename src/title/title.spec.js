@@ -115,6 +115,7 @@ describe('ngIdle', function() {
       spyOn(Title, 'setAsTimedOut');
       spyOn(Title, 'restore');
       spyOn(Title, 'store');
+      spyOn(Title, 'original');
 
       create = function(template) {
         var el = $compile(angular.element(template||'<title>Hello World</title>'))($scope);
@@ -131,6 +132,14 @@ describe('ngIdle', function() {
 
       it ('should store title on init', function() {
         expect(Title.store).toHaveBeenCalledWith(true);
+      });
+
+      it('should set original title on IdleStart event', function() {
+        create('<title>Dynamic Title</title>');
+        $scope.$broadcast('IdleStart');
+        $scope.$apply();
+
+        expect(Title.original).toHaveBeenCalledWith('Dynamic Title');
       });
 
       it('should set title to idle message on IdleWarn event', function() {

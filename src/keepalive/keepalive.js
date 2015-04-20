@@ -33,7 +33,6 @@ angular.module('ngIdle.keepalive', [])
           ping: null
         };
 
-
         function handleResponse(data, status) {
           $rootScope.$broadcast('KeepaliveResponse', data, status);
         }
