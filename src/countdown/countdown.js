@@ -7,7 +7,7 @@ angular.module('ngIdle.countdown', ['ngIdle.idle'])
       },
       link: function($scope) {
         // Initialize the scope's value to the configured timeout.
-        $scope.value = Idle._options().timeout;
+        $scope.value = Idle.getTimeout();
 
         $scope.$on('IdleWarn', function(e, countdown) {
           $scope.$apply(function() {
