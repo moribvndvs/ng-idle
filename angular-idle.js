@@ -295,14 +295,17 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
     ];
   });
 
-angular.module('ngIdle.countdown', [])
-  .directive('idleCountdown', function() {
+angular.module('ngIdle.countdown', ['ngIdle.idle'])
+  .directive('idleCountdown', ['Idle', function(Idle) {
     return {
       restrict: 'A',
       scope: {
         value: '=idleCountdown'
       },
       link: function($scope) {
+        // Initialize the scope's value to the configured timeout.
+        $scope.value = Idle._options().timeout;
+
         $scope.$on('IdleWarn', function(e, countdown) {
           $scope.$apply(function() {
             $scope.value = countdown;
@@ -316,7 +319,7 @@ angular.module('ngIdle.countdown', [])
         });
       }
     };
-  });
+  }]);
 
 angular.module('ngIdle.title', [])
   .factory('Title', ['$document', '$interpolate', function($document, $interpolate) {
