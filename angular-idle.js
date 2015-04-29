@@ -199,7 +199,7 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
         function getExpiry() {
           var obj = LocalStorage.get('expiry');
 
-          return new Date(obj.time);
+          return obj && obj.time ? new Date(obj.time) : null;
         }
 
         function setExpiry(date) {
@@ -228,7 +228,7 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
           },
           isExpired: function() {
             var expiry = getExpiry();
-            return expiry && expiry <= this._getNow();
+            return expiry !== null && expiry <= this._getNow();
           },
           running: function() {
             return state.running;
@@ -307,13 +307,13 @@ angular.module('ngIdle.countdown', ['ngIdle.idle'])
         $scope.value = Idle.getTimeout();
 
         $scope.$on('IdleWarn', function(e, countdown) {
-          $scope.$apply(function() {
+          $scope.$evalAsync(function() {
             $scope.value = countdown;
           });
         });
 
         $scope.$on('IdleTimeout', function() {
-          $scope.$apply(function() {
+          $scope.$evalAsync(function() {
             $scope.value = 0;
           });
         });
@@ -407,7 +407,7 @@ angular.module('ngIdle.title', [])
 angular.module('ngIdle.localStorage', [])
   .service('IdleLocalStorage', ['$window', function($window) {
     var storage = $window.localStorage;
-
+    
     return {
       set: function(key, value) {
         storage.setItem('ngIdle.'+key, angular.toJson(value));

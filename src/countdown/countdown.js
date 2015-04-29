@@ -10,13 +10,13 @@ angular.module('ngIdle.countdown', ['ngIdle.idle'])
         $scope.value = Idle.getTimeout();
 
         $scope.$on('IdleWarn', function(e, countdown) {
-          $scope.$apply(function() {
+          $scope.$evalAsync(function() {
             $scope.value = countdown;
           });
         });
 
         $scope.$on('IdleTimeout', function() {
-          $scope.$apply(function() {
+          $scope.$evalAsync(function() {
             $scope.value = 0;
           });
         });
