@@ -2,6 +2,16 @@
   "name": "ng-idle",
   "version": "1.0.4",
   "description": "Directives and services for responding to idle users in AngularJS",
+  "keywords": [
+    "angularjs",
+    "idle",
+    "ng-idle",
+    "keepalive",
+    "ping",
+    "angular",
+    "user",
+    "session"
+  ],
   "main": [
     "angular-idle.js",
     "angular-idle.min.js",
@@ -18,6 +28,9 @@
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/HackedByChinese/ng-idle/issues"
+  },
+  "dependencies": {
+    "angular": "^1.2.0"
   },
   "devDependencies": {
     "grunt": "~0.4.2",
@@ -39,7 +52,6 @@
     "karma-script-launcher": "~0.1.0",
     "matchdep": "~0.3.0",
     "requirejs": "~2.1.10",
-    "angular": "^1.2.0",
     "angular-mocks": "^1.2.0",
     "jquery": "^2.0.3"
   }
