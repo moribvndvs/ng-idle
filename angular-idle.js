@@ -304,7 +304,7 @@ angular.module('ngIdle.countdown', ['ngIdle.idle'])
       },
       link: function($scope) {
         // Initialize the scope's value to the configured timeout.
-        $scope.value = Idle._options().timeout;
+        $scope.value = Idle.getTimeout();
 
         $scope.$on('IdleWarn', function(e, countdown) {
           $scope.$apply(function() {
@@ -325,7 +325,7 @@ angular.module('ngIdle.title', [])
   .factory('Title', ['$document', '$interpolate', function($document, $interpolate) {
 
     function padLeft(nr, n, str){
-      return Array(n-String(nr).length+1).join(str||'0')+nr;
+      return new Array(n-String(nr).length+1).join(str||'0')+nr;
     }
 
     var state = {
@@ -385,7 +385,7 @@ angular.module('ngIdle.title', [])
 
           Title.store(true);
 
-          $scope.$on('IdleStart', function(e) {
+          $scope.$on('IdleStart', function() {
             Title.original($element[0].innerText);
           });
 
@@ -407,7 +407,7 @@ angular.module('ngIdle.title', [])
 angular.module('ngIdle.localStorage', [])
   .service('IdleLocalStorage', ['$window', function($window) {
     var storage = $window.localStorage;
-    
+
     return {
       set: function(key, value) {
         storage.setItem('ngIdle.'+key, angular.toJson(value));
