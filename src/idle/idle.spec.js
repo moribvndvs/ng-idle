@@ -342,6 +342,10 @@ describe('ngIdle', function() {
         expect(Idle.isExpired()).toBe(true);
       });
 
+      it ('isExpired() should return false if there is no expiry yet', function() {
+        expect(Idle.isExpired()).toBe(false);
+      });
+
       it ('interrupt() should broadcast $timeout if running and past expiry', function() {
         spyOn($rootScope, '$broadcast');
 
