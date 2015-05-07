@@ -13,11 +13,12 @@ describe('ngIdle', function() {
   describe('idle-countdown', function() {
     beforeEach(module('ngIdle.countdown'));
 
-    var $compile, $scope, create;
+    var $compile, $scope, create, Idle;
 
-    beforeEach(inject(function(_$rootScope_, _$compile_) {
+    beforeEach(inject(function(_$rootScope_, _$compile_, _Idle_) {
       $scope = _$rootScope_;
       $compile = _$compile_;
+      Idle = _Idle_;
 
       create = function() {
         var el = $compile(angular.element('<div idle-countdown="countdown">{{countdown}} seconds remaining.</div>'))($scope);
@@ -25,6 +26,13 @@ describe('ngIdle', function() {
         return el;
       };
     }));
+
+    it('should initialize the countdown scope value to the Idle timeout', function() {
+      var randomTimeout = Math.floor(Math.random() * 100);
+      Idle.setTimeout(randomTimeout);
+      create();
+      expect($scope.countdown).toBe(randomTimeout);
+    });
 
     it('should update countdown scope value when receiving new IdleWarning event', function() {
       create();

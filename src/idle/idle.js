@@ -119,7 +119,7 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
         function getExpiry() {
           var obj = LocalStorage.get('expiry');
 
-          return new Date(obj.time);
+          return obj && obj.time ? new Date(obj.time) : null;
         }
 
         function setExpiry(date) {
@@ -134,6 +134,12 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
           _getNow: function() {
             return new Date();
           },
+          getIdle: function(){
+            return options.idle;
+          },
+          getTimeout: function(){
+            return options.timeout;
+          },
           setIdle: function(seconds) {
             changeOption(this, setIdle, seconds);
           },
@@ -142,7 +148,7 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
           },
           isExpired: function() {
             var expiry = getExpiry();
-            return expiry && expiry <= this._getNow();
+            return expiry !== null && expiry <= this._getNow();
           },
           running: function() {
             return state.running;

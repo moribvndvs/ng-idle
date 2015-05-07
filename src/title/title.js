@@ -2,7 +2,7 @@ angular.module('ngIdle.title', [])
   .factory('Title', ['$document', '$interpolate', function($document, $interpolate) {
 
     function padLeft(nr, n, str){
-      return Array(n-String(nr).length+1).join(str||'0')+nr;
+      return new Array(n-String(nr).length+1).join(str||'0')+nr;
     }
 
     var state = {
@@ -61,6 +61,10 @@ angular.module('ngIdle.title', [])
           if ($attr.idleDisabled) return;
 
           Title.store(true);
+
+          $scope.$on('IdleStart', function() {
+            Title.original($element[0].innerText);
+          });
 
           $scope.$on('IdleWarn', function(e, countdown) {
             Title.setAsIdle(countdown);

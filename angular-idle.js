@@ -1,6 +1,6 @@
 /*** Directives and services for responding to idle users in AngularJS
 * @author Mike Grabski <me@mikegrabski.com>
-* @version v1.0.4
+* @version v1.1.0
 * @link https://github.com/HackedByChinese/ng-idle.git
 * @license MIT
 */
@@ -41,7 +41,6 @@ angular.module('ngIdle.keepalive', [])
         var state = {
           ping: null
         };
-
 
         function handleResponse(data, status) {
           $rootScope.$broadcast('KeepaliveResponse', data, status);
@@ -200,7 +199,7 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
         function getExpiry() {
           var obj = LocalStorage.get('expiry');
 
-          return new Date(obj.time);
+          return obj && obj.time ? new Date(obj.time) : null;
         }
 
         function setExpiry(date) {
@@ -215,6 +214,12 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
           _getNow: function() {
             return new Date();
           },
+          getIdle: function(){
+            return options.idle;
+          },
+          getTimeout: function(){
+            return options.timeout;
+          },
           setIdle: function(seconds) {
             changeOption(this, setIdle, seconds);
           },
@@ -223,7 +228,7 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
           },
           isExpired: function() {
             var expiry = getExpiry();
-            return expiry && expiry <= this._getNow();
+            return expiry !== null && expiry <= this._getNow();
           },
           running: function() {
             return state.running;
@@ -290,34 +295,37 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
     ];
   });
 
-angular.module('ngIdle.countdown', [])
-  .directive('idleCountdown', function() {
+angular.module('ngIdle.countdown', ['ngIdle.idle'])
+  .directive('idleCountdown', ['Idle', function(Idle) {
     return {
       restrict: 'A',
       scope: {
         value: '=idleCountdown'
       },
       link: function($scope) {
+        // Initialize the scope's value to the configured timeout.
+        $scope.value = Idle.getTimeout();
+
         $scope.$on('IdleWarn', function(e, countdown) {
-          $scope.$apply(function() {
+          $scope.$evalAsync(function() {
             $scope.value = countdown;
           });
         });
 
         $scope.$on('IdleTimeout', function() {
-          $scope.$apply(function() {
+          $scope.$evalAsync(function() {
             $scope.value = 0;
           });
         });
       }
     };
-  });
+  }]);
 
 angular.module('ngIdle.title', [])
   .factory('Title', ['$document', '$interpolate', function($document, $interpolate) {
 
     function padLeft(nr, n, str){
-      return Array(n-String(nr).length+1).join(str||'0')+nr;
+      return new Array(n-String(nr).length+1).join(str||'0')+nr;
     }
 
     var state = {
@@ -376,6 +384,10 @@ angular.module('ngIdle.title', [])
           if ($attr.idleDisabled) return;
 
           Title.store(true);
+
+          $scope.$on('IdleStart', function() {
+            Title.original($element[0].innerText);
+          });
 
           $scope.$on('IdleWarn', function(e, countdown) {
             Title.setAsIdle(countdown);
