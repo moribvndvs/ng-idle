@@ -195,8 +195,20 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
           }
         };
 
-        $document.find('body').on(options.interrupt, function() {
-          svc.interrupt();
+        $document.find('body').on(options.interrupt, function(event) {
+          /*
+            note:
+              webkit fires fake mousemove events when the user has done nothing, so the idle will never time out while the cursor is over the webpage
+              Original webkit bug report which caused this issue:
+                https://bugs.webkit.org/show_bug.cgi?id=17052
+              Chromium bug reports for issue:
+                https://code.google.com/p/chromium/issues/detail?id=5598
+                https://code.google.com/p/chromium/issues/detail?id=241476
+                https://code.google.com/p/chromium/issues/detail?id=317007
+          */
+          if (event.type !== 'mousemove' || (event.movementX || event.movementY)) {
+            svc.interrupt();
+          }
         });
 
         var wrap = function(event) {
