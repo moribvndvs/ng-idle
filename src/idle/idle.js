@@ -195,7 +195,7 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
           }
         };
 
-        $document.find('body').on(options.interrupt, /webkit/i.test(navigator.userAgent) ? function(event) {
+        $document.find('body').on(options.interrupt, /webkit/i.test($window.navigator.userAgent) ? function(event) {
           /*
             note:
               webkit fires fake mousemove events when the user has done nothing, so the idle will never time out while the cursor is over the webpage
