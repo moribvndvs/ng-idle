@@ -195,6 +195,7 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
           }
         };
 
+        var isWebkit = /webkit/i.test(navigator.userAgent);
         $document.find('body').on(options.interrupt, function(event) {
           /*
             note:
@@ -206,7 +207,7 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
                 https://code.google.com/p/chromium/issues/detail?id=241476
                 https://code.google.com/p/chromium/issues/detail?id=317007
           */
-          if (event.type !== 'mousemove' || (event.movementX || event.movementY)) {
+          if (isWebkit && (event.type !== 'mousemove' || (event.movementX || event.movementY))) {
             svc.interrupt();
           }
         });
