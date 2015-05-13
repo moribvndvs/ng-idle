@@ -125,7 +125,8 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
           timeout: null,
           idling: false,
           running: false,
-          countdown: null
+          countdown: null,
+          interrupting: true
         };
 
         var id = new Date().getTime();
@@ -207,6 +208,24 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
           else LocalStorage.set('expiry', {id: id, time: date});
         }
 
+        function attachInterrupts() {
+            $document.find('body').on(options.interrupt, function(event) {
+            /*
+              note:
+                webkit fires fake mousemove events when the user has done nothing, so the idle will never time out while the cursor is over the webpage
+                Original webkit bug report which caused this issue:
+                  https://bugs.webkit.org/show_bug.cgi?id=17052
+                Chromium bug reports for issue:
+                  https://code.google.com/p/chromium/issues/detail?id=5598
+                  https://code.google.com/p/chromium/issues/detail?id=241476
+                  https://code.google.com/p/chromium/issues/detail?id=317007
+            */
+            //if (event.type !== 'mousemove' || (event.movementX || event.movementY)) {
+              svc.interrupt();
+            //}
+          });
+        }
+
         var svc = {
           _options: function() {
             return options;
@@ -236,6 +255,9 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
           idling: function() {
             return state.idling;
           },
+          interrupting: function() {
+            return state.interrupting;
+          },
           watch: function(noExpiryUpdate) {
             $interval.cancel(state.idle);
             $interval.cancel(state.timeout);
@@ -263,6 +285,11 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
             stopKeepalive();
           },
           interrupt: function(noExpiryUpdate) {
+            if (!state.interrupting) {
+              state.interrupting = true;
+              attachInterrupts();
+            }
+            
             if (!state.running) return;
 
             if (options.timeout && this.isExpired()) {
@@ -272,12 +299,18 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
 
             // note: you can no longer auto resume once we exceed the expiry; you will reset state by calling watch() manually
             if (options.autoResume === 'idle' || (options.autoResume === 'notIdle' && !state.idling)) this.watch(noExpiryUpdate);
+          },
+          uninterrupt: function() {
+            if (!state.interrupting) return;
+
+            state.interrupting = false;
+
+            $document.find('body').off(options.interrupt);
           }
         };
 
-        $document.find('body').on(options.interrupt, function() {
-          svc.interrupt();
-        });
+        attachInterrupts();
+        
 
         var wrap = function(event) {
           if (event.key === 'ngIdle.expiry' && event.newValue !== event.oldValue) {

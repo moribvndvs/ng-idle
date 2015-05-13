@@ -236,6 +236,14 @@ describe('ngIdle', function() {
 
         expect(Keepalive.stop).toHaveBeenCalled();
       });
+	  
+	  it('uninterrupt() should update options.interrupting', function() {
+        Idle.watch();
+
+        Idle.uninterrupt();
+
+		expect(Idle.interrupting()).toBe(false);
+      });
 
       it('should broadcast IdleStart and stop keepalive', function() {
         spyOn($rootScope, '$broadcast');
@@ -388,18 +396,60 @@ describe('ngIdle', function() {
 
       // HACK: the body event listener is only respected the first time, and thus always checks the first Idle instance we created rather than the one we created last.
       // in practice, the functionality works fine, but here the test always fails. dunno how to fix it right now.
-      // it ('document event should interrupt idle timeout', function() {
+       //it ('document event should interrupt idle timeout', function() {
 
-      //   Idle.watch();
-      //   $timeout.flush();
+       //  Idle.watch();
+       //  $timeout.flush();
 
-      //   expect(Idle.idling()).toBe(true);
+       //  expect(Idle.idling()).toBe(true);
 
-      //   var e = $.Event('click');
-      //   $('body').trigger(e);
+       //  var e = $.Event('click');
+       //  $('body').trigger(e);
 
-      //   expect(Idle.idling()).toBe(false);
-      // });
+       //  expect(Idle.idling()).toBe(false);
+       //});
+	   
+	   // HACK: the body event listener is only respected the first time, and thus always checks the first Idle instance we created rather than the one we created last.
+      // in practice, the functionality works fine
+       it ('document event should interrupt idle timeout', function() {
+
+         Idle.watch();
+         $interval.flush(DEFAULTIDLEDURATION);
+
+         expect(Idle.idling()).toBe(true);
+
+         var e = $.Event('mousedown');
+         $('body').trigger(e);
+
+         expect(Idle.idling()).toBe(false);
+       });
+	   
+	   it ('document event should not interrupt idle timeout when calling uninterrupt', function() {
+
+         Idle.watch();
+         $interval.flush(DEFAULTIDLEDURATION);
+		 // We should be idling
+         expect(Idle.idling()).toBe(true);
+		 // We turn of event interrupting
+		 Idle.uninterrupt();
+		 // trigger an event
+         var e = $.Event('mousedown');
+         $('body').trigger(e);
+		 // We expect to be still idling since we turned off event interrupting
+         expect(Idle.idling()).toBe(true);
+		 // We will manually interrupt, which turn event interrupting back on
+		 Idle.interrupt();
+		 // Here we re-test again to make sure normal event interrupting works
+		 expect(Idle.idling()).toBe(false);
+		 
+		 $interval.flush(DEFAULTIDLEDURATION);
+
+         expect(Idle.idling()).toBe(true);
+		 
+         $('body').trigger(e);
+		 
+		 expect(Idle.idling()).toBe(false);
+       });
     });
 
     describe('Idle with different autoResume values', function() {
