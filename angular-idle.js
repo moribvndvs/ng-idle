@@ -220,9 +220,9 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
                   https://code.google.com/p/chromium/issues/detail?id=241476
                   https://code.google.com/p/chromium/issues/detail?id=317007
             */
-            if (event.type !== 'mousemove' || (event.movementX || event.movementY)) {
+            //if (event.type !== 'mousemove' || (event.movementX || event.movementY)) {
               svc.interrupt();
-            }
+            //}
           });
         }
 
