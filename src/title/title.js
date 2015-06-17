@@ -54,11 +54,11 @@ angular.module('ngIdle.title', [])
       }
     };
   }])
-  .directive('title', ['Title', function(Title) {
+  .directive('title', ['Idle', 'Title', function(Idle, Title) {
       return {
         restrict: 'E',
         link: function($scope, $element, $attr) {
-          if ($attr.idleDisabled) return;
+          if (Idle.isTitleDisabled() || $attr.idleDisabled) return;
 
           Title.store(true);
 
