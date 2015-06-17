@@ -5,7 +5,8 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
       timeout: 30, // in seconds (default is 30sec)
       autoResume: 'idle', // lets events automatically resume (unsets idle state/resets warning)
       interrupt: 'mousemove keydown DOMMouseScroll mousewheel mousedown touchstart touchmove scroll',
-      keepalive: true
+      keepalive: true,
+      titleDisabled: false // disable changes in document's title
     };
 
     /**
@@ -26,6 +27,10 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
       if (seconds <= 0) throw new Error('Idle must be a value in seconds, greater than 0.');
 
       options.idle = seconds;
+    };
+
+    var setTitleDisabled = this.titleDisabled = function(disabled) {
+      options.titleDisabled = disabled === true;
     };
 
     this.autoResume = function(value) {
@@ -142,6 +147,12 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
           },
           setIdle: function(seconds) {
             changeOption(this, setIdle, seconds);
+          },
+          setTitleDisabled: function(disabled) {
+            changeOption(this, setTitleDisabled, disabled);
+          },
+          isTitleDisabled: function() {
+            return options.titleDisabled;
           },
           setTimeout: function(seconds) {
             changeOption(this, setTimeout, seconds);

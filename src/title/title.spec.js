@@ -104,11 +104,12 @@ describe('ngIdle', function() {
 
   describe('title directive', function() {
 
-    var $compile, $scope, create, Title;
+    var $compile, $scope, create, Idle, Title;
 
-    beforeEach(inject(function(_$rootScope_, _$compile_, _Title_) {
+    beforeEach(inject(function(_$rootScope_, _$compile_, _Idle_, _Title_) {
       $scope = _$rootScope_;
       $compile = _$compile_;
+      Idle = _Idle_;
       Title = _Title_;
 
       spyOn(Title, 'setAsIdle');
@@ -169,6 +170,39 @@ describe('ngIdle', function() {
 
       beforeEach(function() {
         create('<div title idle-disabled="false">Hello World</div>');
+      });
+
+      it ('should not store title on init', function() {
+        expect(Title.store).not.toHaveBeenCalled();
+      });
+
+      it('should not set title to idle message on IdleWarn event', function() {
+        $scope.$broadcast('IdleWarn', 5);
+        $scope.$apply();
+
+        expect(Title.setAsIdle).not.toHaveBeenCalled();
+      });
+
+      it('should not set title to timeout message on IdleTimeout event', function() {
+        $scope.$broadcast('IdleTimeout');
+        $scope.$apply();
+
+        expect(Title.setAsTimedOut).not.toHaveBeenCalled();
+      });
+
+      it ('should not restore title on IdleEnd event', function() {
+        $scope.$broadcast('IdleEnd');
+        $scope.$apply();
+
+        expect(Title.restore).not.toHaveBeenCalled();
+      });
+    });
+
+    describe('when disabled through configuration', function() {
+
+      beforeEach(function() {
+        Idle.setTitleDisabled(true);
+        create('<div title>Hello World</div>');
       });
 
       it ('should not store title on init', function() {
