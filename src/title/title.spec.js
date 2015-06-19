@@ -106,10 +106,22 @@ describe('ngIdle', function() {
 
     var $compile, $scope, create, Idle, Title;
 
-    beforeEach(inject(function(_$rootScope_, _$compile_, _Idle_, _Title_) {
+    beforeEach(module(function($provide) {
+      Idle = {
+        titleDisabled: false,
+        setTitleDisabled: function(value) {
+          this.titleDisabled = value;
+        },
+        isTitleDisabled: function() {
+          return this.titleDisabled;
+        }
+      };
+      $provide.value('Idle', Idle);
+    }));
+
+    beforeEach(inject(function(_$rootScope_, _$compile_, _Title_) {
       $scope = _$rootScope_;
       $compile = _$compile_;
-      Idle = _Idle_;
       Title = _Title_;
 
       spyOn(Title, 'setAsIdle');
