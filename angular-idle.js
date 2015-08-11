@@ -286,7 +286,10 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
           }
         };
 
-        $document.find('body').on(options.interrupt, function() {
+        $document.find('body').on(options.interrupt, function(event) {
+          if (event.type === 'mousemove' && event.originalEvent.movementX === 0 && event.originalEvent.movementY === 0) {
+            return; // Fix for Chrome desktop notifications, triggering mousemove event.
+          }          
           svc.interrupt();
         });
 
