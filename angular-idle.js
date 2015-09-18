@@ -286,8 +286,20 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
           }
         };
 
-        $document.find('body').on(options.interrupt, function() {
-          svc.interrupt();
+        $document.find('body').on(options.interrupt, function(event) {
+          /*
+            note:
+              webkit fires fake mousemove events when the user has done nothing, so the idle will never time out while the cursor is over the webpage
+              Original webkit bug report which caused this issue:
+                https://bugs.webkit.org/show_bug.cgi?id=17052
+              Chromium bug reports for issue:
+                https://code.google.com/p/chromium/issues/detail?id=5598
+                https://code.google.com/p/chromium/issues/detail?id=241476
+                https://code.google.com/p/chromium/issues/detail?id=317007
+          */
+          if (event.type !== 'mousemove' || (event.movementX || event.movementY)) {
+            svc.interrupt();
+          }
         });
 
         var wrap = function(event) {
@@ -417,8 +429,45 @@ angular.module('ngIdle.title', [])
 
 angular.module('ngIdle.localStorage', [])
   .service('IdleLocalStorage', ['$window', function($window) {
-    var storage = $window.localStorage;
-    
+    var storage = null;
+
+    function AlternativeStorage() {
+      var strorageMap = {};
+
+      this.setItem = function (key, value) {
+          strorageMap[key] = value;
+      };
+
+      this.getItem = function (key) {
+          if(typeof strorageMap[key] !== 'undefined' ) {
+              return strorageMap[key];
+          }
+          return null;
+      };
+
+      this.removeItem = function (key) {
+          strorageMap[key] = undefined;
+      };
+    }
+
+    function getStorage() {
+      var storage = $window.localStorage;
+
+       try { 
+          localStorage.setItem("ngIdleStorage", ""); 
+          localStorage.removeItem("ngIdleStorage");
+          storage = localStorage;
+       } catch(err) { 
+          storage = new AlternativeStorage();
+       }
+        return storage;
+    }
+
+    // Safari, in Private Browsing Mode, looks like it supports localStorage but all calls to setItem
+    // throw QuotaExceededError. We're going to detect this and just silently drop any calls to setItem
+    // to avoid the entire page breaking, without having to do a check at each usage of Storage.
+    storage = getStorage();
+
     return {
       set: function(key, value) {
         storage.setItem('ngIdle.'+key, angular.toJson(value));
@@ -430,6 +479,5 @@ angular.module('ngIdle.localStorage', [])
         storage.removeItem('ngIdle.'+key);
       }
     };
-  }]);
-
+}]);
 })(window, window.angular);
