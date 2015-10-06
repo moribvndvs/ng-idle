@@ -286,7 +286,7 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
           }
         };
 
-        $document.find('body').on(options.interrupt, function() {
+        $document.find('html').on(options.interrupt, function() {
           svc.interrupt();
         });
 
