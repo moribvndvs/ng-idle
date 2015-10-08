@@ -287,14 +287,23 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
         };
 
         $document.find('body').on(options.interrupt, function(event) {
-          if (event.type === 'mousemove' && event.originalEvent.movementX === 0 && event.originalEvent.movementY === 0) {
-            return; // Fix for Chrome desktop notifications, triggering mousemove event.
-          }          
-          svc.interrupt();
+          /*
+            note:
+              webkit fires fake mousemove events when the user has done nothing, so the idle will never time out while the cursor is over the webpage
+              Original webkit bug report which caused this issue:
+                https://bugs.webkit.org/show_bug.cgi?id=17052
+              Chromium bug reports for issue:
+                https://code.google.com/p/chromium/issues/detail?id=5598
+                https://code.google.com/p/chromium/issues/detail?id=241476
+                https://code.google.com/p/chromium/issues/detail?id=317007
+          */
+          if (event.type !== 'mousemove' || (event.movementX || event.movementY)) {
+            svc.interrupt();
+          }
         });
 
         var wrap = function(event) {
-          if (event.key === 'ngIdle.expiry' && event.newValue !== event.oldValue) {
+          if (event.key === 'ngIdle.expiry' && event.newValue && event.newValue !== event.oldValue) {
             var val = angular.fromJson(event.newValue);
             if (val.id === id) return;
             svc.interrupt(true);
