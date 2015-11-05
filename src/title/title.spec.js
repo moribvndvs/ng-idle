@@ -104,20 +104,7 @@ describe('ngIdle', function() {
 
   describe('title directive', function() {
 
-    var $compile, $scope, create, Idle, Title;
-
-    beforeEach(module(function($provide) {
-      Idle = {
-        titleDisabled: false,
-        setTitleDisabled: function(value) {
-          this.titleDisabled = value;
-        },
-        isTitleDisabled: function() {
-          return this.titleDisabled;
-        }
-      };
-      $provide.value('Idle', Idle);
-    }));
+    var $compile, $scope, create, Title;
 
     beforeEach(inject(function(_$rootScope_, _$compile_, _Title_) {
       $scope = _$rootScope_;
@@ -213,7 +200,7 @@ describe('ngIdle', function() {
     describe('when disabled through configuration', function() {
 
       beforeEach(function() {
-        Idle.setTitleDisabled(true);
+        Title.setEnabled(false);
         create('<div title>Hello World</div>');
       });
 
