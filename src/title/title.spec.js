@@ -15,7 +15,7 @@ describe('ngIdle', function() {
   describe('Title service', function() {
     var $document, doc;
     beforeEach(function() {
-      angular.module('app', function() {});
+      angular.module('app', []);
 
       module('app', function($provide) {
         doc = {title:'Hello, World!'};
@@ -169,6 +169,39 @@ describe('ngIdle', function() {
 
       beforeEach(function() {
         create('<div title idle-disabled="false">Hello World</div>');
+      });
+
+      it ('should not store title on init', function() {
+        expect(Title.store).not.toHaveBeenCalled();
+      });
+
+      it('should not set title to idle message on IdleWarn event', function() {
+        $scope.$broadcast('IdleWarn', 5);
+        $scope.$apply();
+
+        expect(Title.setAsIdle).not.toHaveBeenCalled();
+      });
+
+      it('should not set title to timeout message on IdleTimeout event', function() {
+        $scope.$broadcast('IdleTimeout');
+        $scope.$apply();
+
+        expect(Title.setAsTimedOut).not.toHaveBeenCalled();
+      });
+
+      it ('should not restore title on IdleEnd event', function() {
+        $scope.$broadcast('IdleEnd');
+        $scope.$apply();
+
+        expect(Title.restore).not.toHaveBeenCalled();
+      });
+    });
+
+    describe('when disabled through configuration', function() {
+
+      beforeEach(function() {
+        Title.setEnabled(false);
+        create('<div title>Hello World</div>');
       });
 
       it ('should not store title on init', function() {
