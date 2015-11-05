@@ -17,12 +17,12 @@ describe('ngIdle', function() {
 
     beforeEach(function() {
       angular
-      .module('app', function() {})
-      .config(['KeepaliveProvider',
-      function(_KeepaliveProvider_) {
-        KeepaliveProvider = _KeepaliveProvider_;
-      }
-      ]);
+        .module('app', [])
+        .config(['KeepaliveProvider',
+          function(_KeepaliveProvider_) {
+            KeepaliveProvider = _KeepaliveProvider_;
+          }
+        ]);
 
       module('app');
 
@@ -38,7 +38,12 @@ describe('ngIdle', function() {
 
     var create = function(http) {
       if (http) KeepaliveProvider.http(http);
-      return $injector.invoke(KeepaliveProvider.$get, null, {$rootScope: $rootScope, $log: $log, $interval: $interval, $http: $http});
+      return $injector.invoke(KeepaliveProvider.$get, null, {
+        $rootScope: $rootScope,
+        $log: $log,
+        $interval: $interval,
+        $http: $http
+      });
     };
 
     describe('KeepaliveProvider', function() {
@@ -95,7 +100,7 @@ describe('ngIdle', function() {
     });
 
     describe('Keepalive', function() {
-      var Keepalive, DEFAULTKEEPALIVEINTERVAL = 10*60*1000;
+      var Keepalive, DEFAULTKEEPALIVEINTERVAL = 10 * 60 * 1000;
 
       beforeEach(function() {
         Keepalive = create();
@@ -106,18 +111,18 @@ describe('ngIdle', function() {
         $httpBackend.verifyNoOutstandingRequest();
       });
 
-      it('setInterval should update an interval option', function(){
+      it('setInterval should update an interval option', function() {
         Keepalive.setInterval(100);
         expect(create()._options().interval).toBe(100);
       });
-      it('start() after a new LONGER timeout should NOT broadcast Keepalive when the default timeout expires', function(){
+      it('start() after a new LONGER timeout should NOT broadcast Keepalive when the default timeout expires', function() {
         spyOn($rootScope, '$broadcast');
-        Keepalive.setInterval(100*60);
+        Keepalive.setInterval(100 * 60);
         Keepalive.start();
         $interval.flush(DEFAULTKEEPALIVEINTERVAL);
         expect($rootScope.$broadcast).not.toHaveBeenCalledWith('Keepalive');
       });
-      it('start() after a new LONGER timeout should broadcast Keepalive when the new LONGER expires', function(){
+      it('start() after a new LONGER timeout should broadcast Keepalive when the new LONGER expires', function() {
         spyOn($rootScope, '$broadcast');
         Keepalive.setInterval(100);
         Keepalive.start();
@@ -163,7 +168,7 @@ describe('ngIdle', function() {
         Keepalive.start();
 
         $httpBackend.expectGET('/path/to/keepalive')
-        .respond(200);
+          .respond(200);
 
         $interval.flush(DEFAULTKEEPALIVEINTERVAL);
 
@@ -180,7 +185,7 @@ describe('ngIdle', function() {
         Keepalive.start();
 
         $httpBackend.expectGET('/path/to/keepalive')
-        .respond(404);
+          .respond(404);
 
         $interval.flush(DEFAULTKEEPALIVEINTERVAL);
 

@@ -287,19 +287,10 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
         };
 
         $document.find('body').on(options.interrupt, function(event) {
-          /*
-            note:
-              webkit fires fake mousemove events when the user has done nothing, so the idle will never time out while the cursor is over the webpage
-              Original webkit bug report which caused this issue:
-                https://bugs.webkit.org/show_bug.cgi?id=17052
-              Chromium bug reports for issue:
-                https://code.google.com/p/chromium/issues/detail?id=5598
-                https://code.google.com/p/chromium/issues/detail?id=241476
-                https://code.google.com/p/chromium/issues/detail?id=317007
-          */
-          if (event.type !== 'mousemove' || (event.movementX || event.movementY)) {
-            svc.interrupt();
+          if (event.type === 'mousemove' && event.originalEvent.movementX === 0 && event.originalEvent.movementY === 0) {
+            return; // Fix for Chrome desktop notifications, triggering mousemove event.
           }
+          svc.interrupt();
         });
 
         var wrap = function(event) {
@@ -453,11 +444,11 @@ angular.module('ngIdle.localStorage', [])
     function getStorage() {
       var storage = $window.localStorage;
 
-       try { 
-          localStorage.setItem("ngIdleStorage", ""); 
+       try {
+          localStorage.setItem("ngIdleStorage", "");
           localStorage.removeItem("ngIdleStorage");
           storage = localStorage;
-       } catch(err) { 
+       } catch(err) {
           storage = new AlternativeStorage();
        }
         return storage;
@@ -479,5 +470,11 @@ angular.module('ngIdle.localStorage', [])
         storage.removeItem('ngIdle.'+key);
       }
     };
+<<<<<<< HEAD
 }]);
 })(window, window.angular);
+=======
+  }]);
+
+})(window, window.angular);
+>>>>>>> develop

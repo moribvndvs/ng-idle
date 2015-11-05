@@ -15,7 +15,7 @@ describe('ngIdle', function() {
   describe('Title service', function() {
     var $document, doc;
     beforeEach(function() {
-      angular.module('app', function() {});
+      angular.module('app', []);
 
       module('app', function($provide) {
         doc = {title:'Hello, World!'};
