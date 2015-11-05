@@ -227,7 +227,7 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
         });
 
         var wrap = function(event) {
-          if (event.key === 'ngIdle.expiry' && event.newValue !== event.oldValue) {
+          if (event.key === 'ngIdle.expiry' && event.newValue && event.newValue !== event.oldValue) {
             var val = angular.fromJson(event.newValue);
             if (val.id === id) return;
             svc.interrupt(true);
