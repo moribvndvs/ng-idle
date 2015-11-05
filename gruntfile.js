@@ -38,7 +38,7 @@ module.exports = function(grunt) {
         browsers: [grunt.option('browser') || 'Chrome']
       }
     },
-    clean: pkg.main,
+    clean: [pkg.main],
     concat: {
       options: {
         stripBanners: true,
