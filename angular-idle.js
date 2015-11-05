@@ -286,12 +286,28 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
           }
         };
 
-        $document.find('html').on(options.interrupt, function() {
-          svc.interrupt();
+        $document.find('body').on(options.interrupt, function(event) {
+          if (event.type === 'mousemove' && event.originalEvent && event.originalEvent.movementX === 0 && event.originalEvent.movementY === 0) {
+            return; // Fix for Chrome desktop notifications, triggering mousemove event.
+          }
+
+          /*
+            note:
+              webkit fires fake mousemove events when the user has done nothing, so the idle will never time out while the cursor is over the webpage
+              Original webkit bug report which caused this issue:
+                https://bugs.webkit.org/show_bug.cgi?id=17052
+              Chromium bug reports for issue:
+                https://code.google.com/p/chromium/issues/detail?id=5598
+                https://code.google.com/p/chromium/issues/detail?id=241476
+                https://code.google.com/p/chromium/issues/detail?id=317007
+          */
+          if (event.type !== 'mousemove' || angular.isUndefined(event.movementX) || (event.movementX || event.movementY)) {
+            svc.interrupt();
+          }
         });
 
         var wrap = function(event) {
-          if (event.key === 'ngIdle.expiry' && event.newValue !== event.oldValue) {
+          if (event.key === 'ngIdle.expiry' && event.newValue && event.newValue !== event.oldValue) {
             var val = angular.fromJson(event.newValue);
             if (val.id === id) return;
             svc.interrupt(true);
@@ -416,9 +432,50 @@ angular.module('ngIdle.title', [])
   }]);
 
 angular.module('ngIdle.localStorage', [])
-  .service('IdleLocalStorage', ['$window', function($window) {
-    var storage = $window.localStorage;
-    
+  .service('IdleStorageAccessor', ['$window', function($window) {
+    return {
+      get: function() {
+        return $window.localStorage;
+      }
+    }
+  }])
+  .service('IdleLocalStorage', ['IdleStorageAccessor', function(IdleStorageAccessor) {
+    function AlternativeStorage() {
+      var storageMap = {};
+
+      this.setItem = function (key, value) {
+          storageMap[key] = value;
+      };
+
+      this.getItem = function (key) {
+          if(typeof storageMap[key] !== 'undefined' ) {
+              return storageMap[key];
+          }
+          return null;
+      };
+
+      this.removeItem = function (key) {
+          storageMap[key] = undefined;
+      };
+    }
+
+    function getStorage() {
+       try {
+          var s = IdleStorageAccessor.get();
+          s.setItem('ngIdleStorage', '');
+          s.removeItem('ngIdleStorage');
+
+          return s;
+       } catch(err) {
+          return new AlternativeStorage();
+       }
+    }
+
+    // Safari, in Private Browsing Mode, looks like it supports localStorage but all calls to setItem
+    // throw QuotaExceededError. We're going to detect this and just silently drop any calls to setItem
+    // to avoid the entire page breaking, without having to do a check at each usage of Storage.
+    var storage = getStorage();
+
     return {
       set: function(key, value) {
         storage.setItem('ngIdle.'+key, angular.toJson(value));
@@ -428,8 +485,11 @@ angular.module('ngIdle.localStorage', [])
       },
       remove: function(key) {
         storage.removeItem('ngIdle.'+key);
+      },
+      _wrapped: function() {
+        return storage;
       }
     };
-  }]);
+}]);
 
 })(window, window.angular);
