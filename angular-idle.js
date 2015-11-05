@@ -1,6 +1,6 @@
 /*** Directives and services for responding to idle users in AngularJS
 * @author Mike Grabski <me@mikegrabski.com>
-* @version v1.1.0
+* @version v1.1.1
 * @link https://github.com/HackedByChinese/ng-idle.git
 * @license MIT
 */
@@ -85,8 +85,7 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
       timeout: 30, // in seconds (default is 30sec)
       autoResume: 'idle', // lets events automatically resume (unsets idle state/resets warning)
       interrupt: 'mousemove keydown DOMMouseScroll mousewheel mousedown touchstart touchmove scroll',
-      keepalive: true,
-      titleDisabled: false // disable changes in document's title
+      keepalive: true
     };
 
     /**
@@ -107,10 +106,6 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
       if (seconds <= 0) throw new Error('Idle must be a value in seconds, greater than 0.');
 
       options.idle = seconds;
-    };
-
-    var setTitleDisabled = this.titleDisabled = function(disabled) {
-      options.titleDisabled = disabled === true;
     };
 
     this.autoResume = function(value) {
@@ -228,12 +223,6 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
           setIdle: function(seconds) {
             changeOption(this, setIdle, seconds);
           },
-          setTitleDisabled: function(disabled) {
-            changeOption(this, setTitleDisabled, disabled);
-          },
-          isTitleDisabled: function() {
-            return options.titleDisabled;
-          },
           setTimeout: function(seconds) {
             changeOption(this, setTimeout, seconds);
           },
@@ -286,7 +275,7 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
           }
         };
 
-        $document.find('body').on(options.interrupt, function(event) {
+        $document.find('html').on(options.interrupt, function(event) {
           if (event.type === 'mousemove' && event.originalEvent && event.originalEvent.movementX === 0 && event.originalEvent.movementY === 0) {
             return; // Fix for Chrome desktop notifications, triggering mousemove event.
           }
@@ -349,66 +338,79 @@ angular.module('ngIdle.countdown', ['ngIdle.idle'])
   }]);
 
 angular.module('ngIdle.title', [])
-  .factory('Title', ['$document', '$interpolate', function($document, $interpolate) {
+  .provider('Title', function() {
+    var options = {
+      enabled: true
+    };
+
+    var setEnabled = this.enabled = function(enabled) {
+      options.enabled = enabled === true;
+    };
 
     function padLeft(nr, n, str){
       return new Array(n-String(nr).length+1).join(str||'0')+nr;
     }
 
-    var state = {
-      original: null,
-      idle: '{{minutes}}:{{seconds}} until your session times out!',
-      timedout: 'Your session has expired.'
-    };
+    this.$get = ['$document', '$interpolate', function($document, $interpolate) {
+      var state = {
+        original: null,
+        idle: '{{minutes}}:{{seconds}} until your session times out!',
+        timedout: 'Your session has expired.'
+      };
 
-    return {
-      original: function(val) {
-        if (angular.isUndefined(val)) return state.original;
+      return {
+        setEnabled: setEnabled,
+        isEnabled: function() {
+          return options.enabled;
+        },
+        original: function(val) {
+          if (angular.isUndefined(val)) return state.original;
 
-        state.original = val;
-      },
-      store: function(overwrite) {
-        if (overwrite || !state.original) state.original = this.value();
-      },
-      value: function(val) {
-        if (angular.isUndefined(val)) return $document[0].title;
+          state.original = val;
+        },
+        store: function(overwrite) {
+          if (overwrite || !state.original) state.original = this.value();
+        },
+        value: function(val) {
+          if (angular.isUndefined(val)) return $document[0].title;
 
-        $document[0].title = val;
-      },
-      idleMessage: function(val) {
-        if (angular.isUndefined(val)) return state.idle;
+          $document[0].title = val;
+        },
+        idleMessage: function(val) {
+          if (angular.isUndefined(val)) return state.idle;
 
-        state.idle = val;
-      },
-      timedOutMessage: function(val) {
-        if (angular.isUndefined(val)) return state.timedout;
+          state.idle = val;
+        },
+        timedOutMessage: function(val) {
+          if (angular.isUndefined(val)) return state.timedout;
 
-        state.timedout = val;
-      },
-      setAsIdle: function(countdown) {
-        this.store();
+          state.timedout = val;
+        },
+        setAsIdle: function(countdown) {
+          this.store();
 
-        var remaining = { totalSeconds: countdown };
-        remaining.minutes = Math.floor(countdown/60);
-        remaining.seconds = padLeft(countdown - remaining.minutes * 60, 2);
+          var remaining = { totalSeconds: countdown };
+          remaining.minutes = Math.floor(countdown/60);
+          remaining.seconds = padLeft(countdown - remaining.minutes * 60, 2);
 
-        this.value($interpolate(this.idleMessage())(remaining));
-      },
-      setAsTimedOut: function() {
-        this.store();
+          this.value($interpolate(this.idleMessage())(remaining));
+        },
+        setAsTimedOut: function() {
+          this.store();
 
-        this.value(this.timedOutMessage());
-      },
-      restore: function() {
-        if (this.original()) this.value(this.original());
-      }
-    };
-  }])
-  .directive('title', ['Idle', 'Title', function(Idle, Title) {
+          this.value(this.timedOutMessage());
+        },
+        restore: function() {
+          if (this.original()) this.value(this.original());
+        }
+      };
+    }];
+  })
+  .directive('title', ['Title', function(Title) {
       return {
         restrict: 'E',
         link: function($scope, $element, $attr) {
-          if (Idle.isTitleDisabled() || $attr.idleDisabled) return;
+          if (!Title.isEnabled() || $attr.idleDisabled) return;
 
           Title.store(true);
 
