@@ -1,43 +1,47 @@
 angular.module('ngIdle.localStorage', [])
-  .service('IdleLocalStorage', ['$window', function($window) {
-    var storage = null;
-
+  .service('IdleStorageAccessor', ['$window', function($window) {
+    return {
+      get: function() {
+        return $window.localStorage;
+      }
+    }
+  }])
+  .service('IdleLocalStorage', ['IdleStorageAccessor', function(IdleStorageAccessor) {
     function AlternativeStorage() {
-      var strorageMap = {};
+      var storageMap = {};
 
       this.setItem = function (key, value) {
-          strorageMap[key] = value;
+          storageMap[key] = value;
       };
 
       this.getItem = function (key) {
-          if(typeof strorageMap[key] !== 'undefined' ) {
-              return strorageMap[key];
+          if(typeof storageMap[key] !== 'undefined' ) {
+              return storageMap[key];
           }
           return null;
       };
 
       this.removeItem = function (key) {
-          strorageMap[key] = undefined;
+          storageMap[key] = undefined;
       };
     }
 
     function getStorage() {
-      var storage = $window.localStorage;
+       try {
+          var s = IdleStorageAccessor.get();
+          s.setItem('ngIdleStorage', '');
+          s.removeItem('ngIdleStorage');
 
-       try { 
-          localStorage.setItem('ngIdleStorage', ''); 
-          localStorage.removeItem('ngIdleStorage');
-          storage = localStorage;
-       } catch(err) { 
-          storage = new AlternativeStorage();
+          return s;
+       } catch(err) {
+          return new AlternativeStorage();
        }
-        return storage;
     }
 
     // Safari, in Private Browsing Mode, looks like it supports localStorage but all calls to setItem
     // throw QuotaExceededError. We're going to detect this and just silently drop any calls to setItem
     // to avoid the entire page breaking, without having to do a check at each usage of Storage.
-    storage = getStorage();
+    var storage = getStorage();
 
     return {
       set: function(key, value) {
@@ -48,6 +52,9 @@ angular.module('ngIdle.localStorage', [])
       },
       remove: function(key) {
         storage.removeItem('ngIdle.'+key);
+      },
+      _wrapped: function() {
+        return storage;
       }
     };
 }]);
