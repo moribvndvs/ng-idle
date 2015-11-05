@@ -206,7 +206,7 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
           }
         };
 
-        $document.find('body').on(options.interrupt, function(event) {
+        $document.find('body').on(options.interrupt, /webkit/i.test($window.navigator.userAgent) ? function(event) {
           /*
             note:
               webkit fires fake mousemove events when the user has done nothing, so the idle will never time out while the cursor is over the webpage
@@ -220,7 +220,7 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
           if (event.type !== 'mousemove' || (event.movementX || event.movementY)) {
             svc.interrupt();
           }
-        });
+        } : svc.interrupt);
 
         var wrap = function(event) {
           if (event.key === 'ngIdle.expiry' && event.newValue !== event.oldValue) {
