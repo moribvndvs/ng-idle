@@ -461,6 +461,23 @@ describe('ngIdle', function() {
         Idle.interrupt();
         expect(Idle.watch).not.toHaveBeenCalled();
       });
+
+      it ('interrupt(true) should call watch() if idle and autoResume is notIdle', function() {
+        IdleProvider.autoResume('notIdle');
+        Idle = create();
+
+        spyOn(Idle, 'watch').andCallThrough();
+
+        // arrange
+        Idle.watch(); // start watching
+        Idle.watch.reset(); // reset watch spy to ignore the prior setup call
+
+        $interval.flush(DEFAULTIDLEDURATION);
+
+        Idle.interrupt(true);
+        expect(Idle.watch).toHaveBeenCalled();
+      });
+
     });
 
     describe('Idle with timeout disabled', function() {
