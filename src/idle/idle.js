@@ -189,7 +189,7 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
 
             stopKeepalive();
           },
-          interrupt: function(noExpiryUpdate) {
+          interrupt: function(anotherTab) {
             if (!state.running) return;
 
             if (options.timeout && this.isExpired()) {
@@ -198,7 +198,7 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
             }
 
             // note: you can no longer auto resume once we exceed the expiry; you will reset state by calling watch() manually
-            if (options.autoResume === 'idle' || (options.autoResume === 'notIdle' && !state.idling)) this.watch(noExpiryUpdate);
+            if (anotherTab || options.autoResume === 'idle' || (options.autoResume === 'notIdle' && !state.idling)) this.watch(anotherTab);
           }
         };
 
