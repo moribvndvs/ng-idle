@@ -85,6 +85,13 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
         }
 
         function countdown() {
+
+          // check not called when no longer idling
+          // possible with multiple tabs
+          if(!state.idling){
+            return;  
+          }
+
           // countdown has expired, so signal timeout
           if (state.countdown <= 0) {
             timeout();
