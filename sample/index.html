@@ -51,6 +51,7 @@
       })
       .config(function(IdleProvider, KeepaliveProvider) {
         KeepaliveProvider.interval(10);
+        IdleProvider.windowInterrupt('focus');
       })
       .run(function($rootScope, Idle, $log, Keepalive){
         Idle.watch();

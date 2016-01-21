@@ -94,7 +94,7 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
           // check not called when no longer idling
           // possible with multiple tabs
           if(!state.idling){
-            return;  
+            return;
           }
 
           // countdown has expired, so signal timeout
@@ -229,11 +229,13 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
 
         if(options.windowInterrupt) {
           var eventList = options.windowInterrupt.split(' ');
+          var fn = function() {
+            svc.interrupt();
+          };
 
           for(var i=0; i<eventList.length; i++) {
-            $window.addEventListener(eventList[i], function() {
-              svc.interrupt();
-            });
+            if ($window.addEventListener) $window.addEventListener(eventList[i], fn, false);
+            else $window.attachEvent(eventList[i], fn)
           }
         }
 
