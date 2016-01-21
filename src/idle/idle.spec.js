@@ -61,6 +61,14 @@ describe('ngIdle', function() {
         expect(create()._options().interrupt).toBe('click');
       });
 
+      it('windowInterrupt() should update defaults', function() {
+        expect(IdleProvider).not.toBeUndefined();
+
+        IdleProvider.windowInterrupt('focus');
+
+        expect(create()._options().windowInterrupt).toBe('focus');
+      });
+
       it('idle() should update defaults', function() {
         expect(IdleProvider).not.toBeUndefined();
 
@@ -400,6 +408,16 @@ describe('ngIdle', function() {
 
       //   expect(Idle.idling()).toBe(false);
       // });
+
+
+      //HACK: this has the same issues as the test above
+      //it('window event should interrupt idle timeout', function() {
+      //  IdleProvider.windowInterrupt('focus');
+      //  Idle = create();
+      //
+      //  Idle.watch();
+      //
+      //});
     });
 
     describe('Idle with different autoResume values', function() {

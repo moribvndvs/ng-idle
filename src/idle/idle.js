@@ -5,6 +5,7 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
       timeout: 30, // in seconds (default is 30sec)
       autoResume: 'idle', // lets events automatically resume (unsets idle state/resets warning)
       interrupt: 'mousemove keydown DOMMouseScroll mousewheel mousedown touchstart touchmove scroll',
+      windowInterrupt: null,
       keepalive: true
     };
 
@@ -20,6 +21,10 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
 
     this.interrupt = function(events) {
       options.interrupt = events;
+    };
+
+    this.windowInterrupt = function(events) {
+      options.windowInterrupt = events;
     };
 
     var setIdle = this.idle = function(seconds) {
@@ -89,7 +94,7 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
           // check not called when no longer idling
           // possible with multiple tabs
           if(!state.idling){
-            return;  
+            return;
           }
 
           // countdown has expired, so signal timeout
@@ -221,6 +226,18 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
             svc.interrupt();
           }
         });
+
+        if(options.windowInterrupt) {
+          var eventList = options.windowInterrupt.split(' ');
+          var fn = function() {
+            svc.interrupt();
+          };
+
+          for(var i=0; i<eventList.length; i++) {
+            if ($window.addEventListener) $window.addEventListener(eventList[i], fn, false);
+            else $window.attachEvent(eventList[i], fn)
+          }
+        }
 
         var wrap = function(event) {
           if (event.key === 'ngIdle.expiry' && event.newValue && event.newValue !== event.oldValue) {
