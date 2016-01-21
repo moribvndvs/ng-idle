@@ -478,6 +478,37 @@ describe('ngIdle', function() {
         expect(Idle.watch).toHaveBeenCalled();
       });
 
+      it ('intrerrupt() should call unwatch() if autoResume is unwatch', function() {
+        IdleProvider.autoResume('unwatch');
+        Idle = create();
+
+        spyOn(Idle, 'unwatch').andCallThrough();
+
+        // arrange
+        Idle.watch(); // start watching
+
+        $interval.flush(DEFAULTIDLEDURATION);
+
+        Idle.interrupt();
+        expect(Idle.unwatch).toHaveBeenCalled();
+      });
+
+      it ('intrerrupt(true) should call watch() if autoResume is unwatch', function() {
+        IdleProvider.autoResume('unwatch');
+        Idle = create();
+
+        spyOn(Idle, 'watch').andCallThrough();
+        Idle.watch.reset(); // reset watch spy to ignore the prior setup call
+
+        // arrange
+        Idle.watch(); // start watching
+
+        $interval.flush(DEFAULTIDLEDURATION);
+
+        Idle.interrupt(true);
+        expect(Idle.watch).toHaveBeenCalled();
+      });
+
     });
 
     describe('Idle with timeout disabled', function() {
