@@ -493,6 +493,23 @@ describe('ngIdle', function() {
         expect(Idle.unwatch).toHaveBeenCalled();
       });
 
+      it ('intrerrupt() should triggle IdleEnd if autoResume is unwatch and they are idling', function() {
+        IdleProvider.autoResume('unwatch');
+
+        spyOn($rootScope, '$broadcast');
+        Idle = create();
+        spyOn(Idle, 'unwatch').andCallThrough();
+
+        // arrange
+        Idle.watch();
+        $interval.flush(DEFAULTIDLEDURATION);
+
+        Idle.interrupt();
+        $rootScope.$digest();
+
+        expect($rootScope.$broadcast).toHaveBeenCalledWith('IdleEnd');
+      });
+
       it ('intrerrupt(true) should call watch() if autoResume is unwatch', function() {
         IdleProvider.autoResume('unwatch');
         Idle = create();
