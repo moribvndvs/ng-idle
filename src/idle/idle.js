@@ -204,6 +204,10 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
 
             // note: you can no longer auto resume once we exceed the expiry; you will reset state by calling watch() manually
             if (anotherTab || options.autoResume === 'idle' || (options.autoResume === 'notIdle' && !state.idling)) this.watch(anotherTab);
+            else if(options.autoResume === 'unwatch') {
+              if (state.idling) toggleState(); // make sure we call IdleEnd in this situation
+              this.unwatch();
+            }
           }
         };
 
