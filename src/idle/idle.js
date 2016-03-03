@@ -73,8 +73,6 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
           state.idling = !state.idling;
           var name = state.idling ? 'Start' : 'End';
 
-          $rootScope.$broadcast('Idle' + name);
-
           if (state.idling) {
             stopKeepalive();
             if (options.timeout) {
@@ -85,6 +83,8 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
           } else {
             startKeepalive();
           }
+
+          $rootScope.$broadcast('Idle' + name);
 
           $interval.cancel(state.idle);
         }
