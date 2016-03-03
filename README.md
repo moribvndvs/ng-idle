@@ -3,6 +3,8 @@ Ng-Idle
 
 [![Join the chat at https://gitter.im/HackedByChinese/ng-idle](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/HackedByChinese/ng-idle?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![Build Status](https://travis-ci.org/HackedByChinese/ng-idle.png?branch=master)](https://travis-ci.org/HackedByChinese/ng-idle)
 
+**Angular 2 Developers**: This module is for Angular 1 only. Check out [ng2-idle](https://github.com/HackedByChinese/ng2-idle) for the Angular 2 version.
+
 ## About
  You may wish to detect idle users and respond, for example, to log them out so their sensitive data is protected, or taunt them, or whatever. I don't care.
 

@@ -5,6 +5,7 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
       timeout: 30, // in seconds (default is 30sec)
       autoResume: 'idle', // lets events automatically resume (unsets idle state/resets warning)
       interrupt: 'mousemove keydown DOMMouseScroll mousewheel mousedown touchstart touchmove scroll',
+      windowInterrupt: null,
       keepalive: true
     };
 
@@ -20,6 +21,10 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
 
     this.interrupt = function(events) {
       options.interrupt = events;
+    };
+
+    this.windowInterrupt = function(events) {
+      options.windowInterrupt = events;
     };
 
     var setIdle = this.idle = function(seconds) {
@@ -68,8 +73,6 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
           state.idling = !state.idling;
           var name = state.idling ? 'Start' : 'End';
 
-          $rootScope.$broadcast('Idle' + name);
-
           if (state.idling) {
             stopKeepalive();
             if (options.timeout) {
@@ -81,10 +84,19 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
             startKeepalive();
           }
 
+          $rootScope.$broadcast('Idle' + name);
+
           $interval.cancel(state.idle);
         }
 
         function countdown() {
+
+          // check not called when no longer idling
+          // possible with multiple tabs
+          if(!state.idling){
+            return;
+          }
+
           // countdown has expired, so signal timeout
           if (state.countdown <= 0) {
             timeout();
@@ -182,7 +194,7 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
 
             stopKeepalive();
           },
-          interrupt: function(noExpiryUpdate) {
+          interrupt: function(anotherTab) {
             if (!state.running) return;
 
             if (options.timeout && this.isExpired()) {
@@ -191,7 +203,24 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
             }
 
             // note: you can no longer auto resume once we exceed the expiry; you will reset state by calling watch() manually
-            if (options.autoResume === 'idle' || (options.autoResume === 'notIdle' && !state.idling)) this.watch(noExpiryUpdate);
+            if (anotherTab || options.autoResume === 'idle' || (options.autoResume === 'notIdle' && !state.idling)) this.watch(anotherTab);
+          }
+        };
+
+        var lastMove = {
+          clientX: null,
+          clientY: null,
+          swap: function(event) {
+            var last = {clientX: this.clientX, clientY: this.clientY};
+            this.clientX = event.clientX;
+            this.clientY = event.clientY;
+            return last;
+          },
+          hasMoved: function(event) {
+            var last = this.swap(event);
+            if (this.clientX === null || event.movementX || event.movementY) return true;
+            else if (last.clientX != event.clientX || last.clientY != event.clientY) return true;
+            else return false;
           }
         };
 
@@ -200,20 +229,22 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
             return; // Fix for Chrome desktop notifications, triggering mousemove event.
           }
 
-          /*
-            note:
-              webkit fires fake mousemove events when the user has done nothing, so the idle will never time out while the cursor is over the webpage
-              Original webkit bug report which caused this issue:
-                https://bugs.webkit.org/show_bug.cgi?id=17052
-              Chromium bug reports for issue:
-                https://code.google.com/p/chromium/issues/detail?id=5598
-                https://code.google.com/p/chromium/issues/detail?id=241476
-                https://code.google.com/p/chromium/issues/detail?id=317007
-          */
-          if (event.type !== 'mousemove' || angular.isUndefined(event.movementX) || (event.movementX || event.movementY)) {
+          if (event.type !== 'mousemove' || lastMove.hasMoved(event)) {
             svc.interrupt();
           }
         });
+
+        if(options.windowInterrupt) {
+          var eventList = options.windowInterrupt.split(' ');
+          var fn = function() {
+            svc.interrupt();
+          };
+
+          for(var i=0; i<eventList.length; i++) {
+            if ($window.addEventListener) $window.addEventListener(eventList[i], fn, false);
+            else $window.attachEvent(eventList[i], fn)
+          }
+        }
 
         var wrap = function(event) {
           if (event.key === 'ngIdle.expiry' && event.newValue && event.newValue !== event.oldValue) {
