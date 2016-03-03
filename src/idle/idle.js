@@ -207,22 +207,29 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
           }
         };
 
+        var lastMove = {
+          clientX: null,
+          clientY: null,
+          swap: function(event) {
+            var last = {clientX: this.clientX, clientY: this.clientY};
+            this.clientX = event.clientX;
+            this.clientY = event.clientY;
+            return last;
+          },
+          hasMoved: function(event) {
+            var last = this.swap(event);
+            if (this.clientX === null || event.movementX || event.movementY) return true;
+            else if (last.clientX != event.clientX || last.clientY != event.clientY) return true;
+            else return false;
+          }
+        };
+
         $document.find('html').on(options.interrupt, function(event) {
           if (event.type === 'mousemove' && event.originalEvent && event.originalEvent.movementX === 0 && event.originalEvent.movementY === 0) {
             return; // Fix for Chrome desktop notifications, triggering mousemove event.
           }
 
-          /*
-            note:
-              webkit fires fake mousemove events when the user has done nothing, so the idle will never time out while the cursor is over the webpage
-              Original webkit bug report which caused this issue:
-                https://bugs.webkit.org/show_bug.cgi?id=17052
-              Chromium bug reports for issue:
-                https://code.google.com/p/chromium/issues/detail?id=5598
-                https://code.google.com/p/chromium/issues/detail?id=241476
-                https://code.google.com/p/chromium/issues/detail?id=317007
-          */
-          if (event.type !== 'mousemove' || angular.isUndefined(event.movementX) || (event.movementX || event.movementY)) {
+          if (event.type !== 'mousemove' || lastMove.hasMoved(event)) {
             svc.interrupt();
           }
         });
