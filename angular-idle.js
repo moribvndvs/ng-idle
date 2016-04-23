@@ -1,6 +1,6 @@
 /*** Directives and services for responding to idle users in AngularJS
 * @author Mike Grabski <me@mikegrabski.com>
-* @version v1.2.0
+* @version v1.2.1
 * @link https://github.com/HackedByChinese/ng-idle.git
 * @license MIT
 */
@@ -151,9 +151,10 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
 
         function toggleState() {
           state.idling = !state.idling;
-          var name = state.idling ? 'Start' : 'End';
+          var name = state.idling ? 'IdleStart' : 'IdleEnd';
 
           if (state.idling) {
+            $rootScope.$broadcast(name);
             stopKeepalive();
             if (options.timeout) {
               state.countdown = options.timeout;
@@ -162,9 +163,8 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
             }
           } else {
             startKeepalive();
+            $rootScope.$broadcast(name);
           }
-
-          $rootScope.$broadcast('Idle' + name);
 
           $interval.cancel(state.idle);
         }
