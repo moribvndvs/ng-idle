@@ -71,9 +71,10 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
 
         function toggleState() {
           state.idling = !state.idling;
-          var name = state.idling ? 'Start' : 'End';
+          var name = state.idling ? 'IdleStart' : 'IdleEnd';
 
           if (state.idling) {
+            $rootScope.$broadcast(name);
             stopKeepalive();
             if (options.timeout) {
               state.countdown = options.timeout;
@@ -82,9 +83,8 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
             }
           } else {
             startKeepalive();
+            $rootScope.$broadcast(name);
           }
-
-          $rootScope.$broadcast('Idle' + name);
 
           $interval.cancel(state.idle);
         }

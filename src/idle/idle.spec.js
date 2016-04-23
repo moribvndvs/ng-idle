@@ -257,6 +257,18 @@ describe('ngIdle', function() {
         expect(Keepalive.stop).toHaveBeenCalled();
       });
 
+      it('should broadcast IdleStart then IdleWarn', function() {
+        spyOn($rootScope, '$broadcast');
+
+        Idle.watch();
+
+        $interval.flush(DEFAULTIDLEDURATION);
+        $rootScope.$digest();
+
+        expect($rootScope.$broadcast).toHaveBeenCalledWith('IdleStart');
+        expect($rootScope.$broadcast.mostRecentCall.args[0]).toBe('IdleWarn');
+      });
+
       it('should broadcast IdleEnd, start keepalive and ping', function() {
         spyOn($rootScope, '$broadcast');
 
