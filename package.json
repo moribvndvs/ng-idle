@@ -1,6 +1,6 @@
 {
   "name": "ng-idle",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Directives and services for responding to idle users in AngularJS",
   "keywords": [
     "angularjs",
@@ -12,7 +12,7 @@
     "user",
     "session"
   ],
-  "main": "angular-idle.js",
+  "main": "index.js",
   "scripts": {
     "test": "grunt test"
   },
