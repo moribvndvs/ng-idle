@@ -38,7 +38,7 @@ module.exports = function(grunt) {
         browsers: [grunt.option('browser') || 'Chrome']
       }
     },
-    clean: [pkg.main],
+    clean: [],
     concat: {
       options: {
         stripBanners: true,
@@ -74,6 +74,6 @@ module.exports = function(grunt) {
 
   grunt.registerTask('test', ['karma:unit']);
   grunt.registerTask('test-server', ['karma:server']);
-  grunt.registerTask('build', ['clean', 'concat:js', 'uglify']);
+  grunt.registerTask('build', ['concat:js', 'uglify']);
   grunt.registerTask('sample', ['connect']);
 };
