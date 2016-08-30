@@ -1,6 +1,6 @@
 /*** Directives and services for responding to idle users in AngularJS
 * @author Mike Grabski <me@mikegrabski.com>
-* @version v1.2.2
+* @version v1.3.0
 * @link https://github.com/HackedByChinese/ng-idle.git
 * @license MIT
 */
@@ -188,6 +188,10 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
           state.countdown--;
         }
 
+        function interrupted(anotherTab) {
+          $rootScope.$broadcast('IdleInterrupt', anotherTab);
+        }
+
         function timeout() {
           stopKeepalive();
           $interval.cancel(state.idle);
@@ -280,6 +284,8 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
             if (options.timeout && this.isExpired()) {
               timeout();
               return;
+            } else {
+              interrupted(anotherTab);
             }
 
             // note: you can no longer auto resume once we exceed the expiry; you will reset state by calling watch() manually

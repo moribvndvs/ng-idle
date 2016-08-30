@@ -406,6 +406,38 @@ describe('ngIdle', function() {
         expect(LocalStorage.set).toHaveBeenCalled();
       });
 
+      it ('interrupt() should broadcast IdleInterrupt if user has not timed out', function() {
+        spyOn($rootScope, '$broadcast');
+
+        Idle.watch();
+        Idle.interrupt();
+
+        expect($rootScope.$broadcast).toHaveBeenCalledWith('IdleInterrupt', undefined);
+      });
+
+      it ('interrupt() should broadcast IdleInterrupt from another tab', function() {
+        spyOn($rootScope, '$broadcast');
+
+        Idle.watch();
+        Idle.interrupt(true);
+
+        expect($rootScope.$broadcast).toHaveBeenCalledWith('IdleInterrupt', true);
+      });
+
+      it ('interrupt() should not broadcast IdleInterrupt if user has timed out', function() {
+        spyOn($rootScope, '$broadcast');
+
+        // fake now to return a time in the future.
+        spyOn(Idle, '_getNow').andCallFake(function() {
+          return new Date(new Date().getTime() + ((DEFAULTIDLEDURATION + DEFAULTTIMEOUT + 60) * 1000));
+        });
+
+        Idle.watch();
+        Idle.interrupt();
+
+        expect($rootScope.$broadcast).not.toHaveBeenCalledWith('IdleInterrupt');
+      });
+
       // HACK: the body event listener is only respected the first time, and thus always checks the first Idle instance we created rather than the one we created last.
       // in practice, the functionality works fine, but here the test always fails. dunno how to fix it right now.
       // it ('document event should interrupt idle timeout', function() {
