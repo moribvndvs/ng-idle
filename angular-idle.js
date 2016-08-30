@@ -187,7 +187,9 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
           $rootScope.$broadcast('IdleWarn', state.countdown);
           state.countdown--;
         }
-
+        function userAction() {                      
+          $rootScope.$broadcast('IdleUserAction');   
+        }  
         function timeout() {
           stopKeepalive();
           $interval.cancel(state.idle);
@@ -280,6 +282,8 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
             if (options.timeout && this.isExpired()) {
               timeout();
               return;
+            } else {
+              userAction();
             }
 
             // note: you can no longer auto resume once we exceed the expiry; you will reset state by calling watch() manually
