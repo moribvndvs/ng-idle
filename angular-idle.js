@@ -188,6 +188,10 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
           state.countdown--;
         }
 
+        function interrupted(anotherTab) {
+          $rootScope.$broadcast('IdleInterrupt', anotherTab);
+        }
+
         function timeout() {
           stopKeepalive();
           $interval.cancel(state.idle);
@@ -280,6 +284,8 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
             if (options.timeout && this.isExpired()) {
               timeout();
               return;
+            } else {
+              interrupted(anotherTab);
             }
 
             // note: you can no longer auto resume once we exceed the expiry; you will reset state by calling watch() manually
