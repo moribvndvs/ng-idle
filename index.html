@@ -12,9 +12,9 @@
     <link href="https://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
     <link rel="stylesheet" type="text/css" media="screen" href="css/site.css">
 
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.min.js"></script>
     <script src="https://rawgithub.com/hackedbychinese/ng-idle/master/angular-idle.js"></script>
-    <script src="js/ui-bootstrap-tpls-0.9.0.min.js"></script>
+    <script src="js/ui-bootstrap-tpls-2.1.3.min.js"></script>
     <script src="js/app.js"></script>
     <title>Ng-idle</title>
   </head>
@@ -64,7 +64,7 @@
             <h2>Demo</h2>
           </header>
           <p>
-          This example uses <code>$modal</code> from <a href="https://angular-ui.github.io/bootstrap">UI Bootstrap</a> to display a warning dialog that counts down the seconds until they are "timed out".
+          This example uses <code>$uibModal</code> from <a href="https://angular-ui.github.io/bootstrap">UI Bootstrap</a> to display a warning dialog that counts down the seconds until they are "timed out".
           In your application, "timing out" might send an HTTP request to end the user's session and send them to a log in screen.
          </p>
          <p>
@@ -117,13 +117,13 @@
                 <pre ng-non-bindable><code data-language="html" class="rainbow">
 &lt;section data-ng-controller=&quot;DemoCtrl&quot;&gt;<br/>  &lt;p&gt;<br/>    &lt;button type=&quot;button&quot; class=&quot;btn btn-success&quot; data-ng-hide=&quot;started&quot; data-ng-click=&quot;start()&quot;&gt;Start Demo&lt;/button&gt;<br/>    &lt;button type=&quot;button&quot; class=&quot;btn btn-danger&quot; data-ng-show=&quot;started&quot; data-ng-click=&quot;stop()&quot;&gt;Stop Demo&lt;/button&gt;<br/>  &lt;/p&gt;<br/>&lt;/section&gt;
 
-&lt;script type=&quot;text/ng-template&quot; id=&quot;warning-dialog.html&quot;&gt;<br/>  &lt;div class=&quot;modal-header&quot;&gt;<br/>   &lt;h3&gt;You're Idle. Do Something!&lt;/h3&gt;<br/>  &lt;/div&gt;<br/>  &lt;div idle-countdown=&quot;countdown&quot; ng-init=&quot;countdown=5&quot; class=&quot;modal-body&quot;&gt;<br/>   &lt;progressbar max=&quot;5&quot; value=&quot;5&quot; animate=&quot;false&quot; class=&quot;progress-striped active&quot;&gt;You'll be logged out in {{countdown}} second(s).&lt;/progressbar&gt;<br/>  &lt;/div&gt;<br/><br/>&lt;/script&gt;<br/>&lt;script type=&quot;text/ng-template&quot; id=&quot;timedout-dialog.html&quot;&gt;<br/>  &lt;div class=&quot;modal-header&quot;&gt;<br/>   &lt;h3&gt;You've Timed Out!&lt;/h3&gt;<br/>  &lt;/div&gt;<br/>  &lt;div class=&quot;modal-body&quot;&gt;<br/>   &lt;p&gt;<br/>      You were idle too long. Normally you'd be logged out, but in this demo just do anything and you'll be reset.<br/>   &lt;/p&gt;<br/> &lt;/div&gt;<br/>&lt;/script&gt;
+&lt;script type=&quot;text/ng-template&quot; id=&quot;warning-dialog.html&quot;&gt;<br/>  &lt;div class=&quot;modal-header&quot;&gt;<br/>   &lt;h3&gt;You're Idle. Do Something!&lt;/h3&gt;<br/>  &lt;/div&gt;<br/>  &lt;div idle-countdown=&quot;countdown&quot; ng-init=&quot;countdown=5&quot; class=&quot;modal-body&quot;&gt;<br/>   &lt;uib-progressbar max=&quot;5&quot; value=&quot;5&quot; animate=&quot;false&quot; class=&quot;progress-striped active&quot;&gt;You'll be logged out in {{countdown}} second(s).&lt;/uib-progressbar&gt;<br/>  &lt;/div&gt;<br/><br/>&lt;/script&gt;<br/>&lt;script type=&quot;text/ng-template&quot; id=&quot;timedout-dialog.html&quot;&gt;<br/>  &lt;div class=&quot;modal-header&quot;&gt;<br/>   &lt;h3&gt;You've Timed Out!&lt;/h3&gt;<br/>  &lt;/div&gt;<br/>  &lt;div class=&quot;modal-body&quot;&gt;<br/>   &lt;p&gt;<br/>      You were idle too long. Normally you'd be logged out, but in this demo just do anything and you'll be reset.<br/>   &lt;/p&gt;<br/> &lt;/div&gt;<br/>&lt;/script&gt;
                 </code></pre>
               </tab>
               <tab heading="JS">
                 <pre ng-non-bindable><code data-language="js" class="rainbow">
   angular.module('demo', ['ngIdle', 'ui.bootstrap'])
-    .controller('DemoCtrl', function($scope, Idle, Keepalive, $modal){
+    .controller('DemoCtrl', function($scope, Idle, Keepalive, $uibModal){
       $scope.started = false;
 
       function closeModals() {
@@ -141,7 +141,7 @@
       $scope.$on('IdleStart', function() {
         closeModals();
 
-        $scope.warning = $modal.open({
+        $scope.warning = $uibModal.open({
           templateUrl: 'warning-dialog.html',
           windowClass: 'modal-danger'
         });
@@ -153,7 +153,7 @@
 
       $scope.$on('IdleTimeout', function() {
         closeModals();
-        $scope.timedout = $modal.open({
+        $scope.timedout = $uibModal.open({
           templateUrl: 'timedout-dialog.html',
           windowClass: 'modal-danger'
         });
@@ -205,7 +205,7 @@ myApp.run(['Idle', function(Idle) {
       </div>
       <div class="modal-body" idle-countdown="countdown" ng-init="countdown=5">
           <p>You'll be logged out in <span class="label label-warning">{{countdown}}</span> <span ng-pluralize="" count="countdown" when="{'one': 'second', 'other': 'seconds' }"></span>.</p>
-          <progressbar max="5" value="countdown" animate="true" class="progress-striped active" type="warning"></progressbar>
+          <uib-progressbar max="5" value="countdown" animate="true" class="progress-striped active" type="warning"></uib-progressbar>
       </div>
 
     </script>

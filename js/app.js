@@ -1,7 +1,7 @@
 (function(window, angular, undefined) {
 	'use strict';
 	angular.module('demo', ['ngIdle', 'ui.bootstrap'])
-		.controller('DemoCtrl', function($scope, Idle, Keepalive, $modal){
+		.controller('DemoCtrl', function($scope, Idle, Keepalive, $uibModal){
 			$scope.started = false;
 
 			function closeModals() {
@@ -19,7 +19,7 @@
 			$scope.$on('IdleStart', function() {
 				closeModals();
 
-				$scope.warning = $modal.open({
+				$scope.warning = $uibModal.open({
 					templateUrl: 'warning-dialog.html',
 					windowClass: 'modal-warning'
 				});
@@ -31,7 +31,7 @@
 
 			$scope.$on('IdleTimeout', function() {
 				closeModals();
-				$scope.timedout = $modal.open({
+				$scope.timedout = $uibModal.open({
 					templateUrl: 'timedout-dialog.html',
 					windowClass: 'modal-danger'
 				});
@@ -47,7 +47,6 @@
 				closeModals();
 				Idle.unwatch();
 				$scope.started = false;
-
 			};
 		})
 		.config(function(IdleProvider, KeepaliveProvider) {
