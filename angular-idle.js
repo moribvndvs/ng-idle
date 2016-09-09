@@ -1,6 +1,6 @@
 /*** Directives and services for responding to idle users in AngularJS
 * @author Mike Grabski <me@mikegrabski.com>
-* @version v1.3.0
+* @version v1.3.1
 * @link https://github.com/HackedByChinese/ng-idle.git
 * @license MIT
 */
@@ -341,7 +341,7 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
         };
 
         if ($window.addEventListener) $window.addEventListener('storage', wrap, false);
-        else $window.attachEvent('onstorage', wrap);
+        else if ($window.attachEvent) $window.attachEvent('onstorage', wrap);
 
         return svc;
       }
