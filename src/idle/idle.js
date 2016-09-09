@@ -261,7 +261,7 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
         };
 
         if ($window.addEventListener) $window.addEventListener('storage', wrap, false);
-        else $window.attachEvent('onstorage', wrap);
+        else if ($window.attachEvent) $window.attachEvent('onstorage', wrap);
 
         return svc;
       }
