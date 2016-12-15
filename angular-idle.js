@@ -51,8 +51,8 @@ angular.module('ngIdle.keepalive', [])
 
           if (angular.isObject(options.http)) {
             $http(options.http)
-              .success(handleResponse)
-              .error(handleResponse);
+              .then(handleResponse)
+              .catch(handleResponse);
           }
         }
 
