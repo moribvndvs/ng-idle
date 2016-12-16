@@ -107,7 +107,6 @@ describe('ngIdle', function() {
       beforeEach(function() {
         Keepalive = create();
         spyOn($rootScope, '$broadcast');
-        $rootScope.$broadcast.reset();
       });
 
       afterEach(function() {
