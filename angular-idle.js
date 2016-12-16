@@ -1,6 +1,6 @@
 /*** Directives and services for responding to idle users in AngularJS
 * @author Mike Grabski <me@mikegrabski.com>
-* @version v1.3.1
+* @version v1.3.2
 * @link https://github.com/HackedByChinese/ng-idle.git
 * @license MIT
 */
@@ -42,8 +42,8 @@ angular.module('ngIdle.keepalive', [])
           ping: null
         };
 
-        function handleResponse(data, status) {
-          $rootScope.$broadcast('KeepaliveResponse', data, status);
+        function handleResponse(response) {
+          $rootScope.$broadcast('KeepaliveResponse', response.data, response.status);
         }
 
         function ping() {
@@ -51,8 +51,8 @@ angular.module('ngIdle.keepalive', [])
 
           if (angular.isObject(options.http)) {
             $http(options.http)
-              .success(handleResponse)
-              .error(handleResponse);
+              .then(handleResponse)
+              .catch(handleResponse);
           }
         }
 
