@@ -47,8 +47,6 @@ describe('ngIdle', function() {
     };
 
     describe('KeepaliveProvider', function() {
-
-
       it('http() should update options with simple GET', function() {
         KeepaliveProvider.http('/path/to/keepalive');
 
@@ -131,7 +129,6 @@ describe('ngIdle', function() {
         expect($rootScope.$broadcast).toHaveBeenCalledWith('Keepalive');
       });
       it('start() should schedule ping timeout that broadcasts Keepalive event when it expires.', function() {
-
         Keepalive.start();
 
         $interval.flush(DEFAULTKEEPALIVEINTERVAL);
@@ -140,7 +137,6 @@ describe('ngIdle', function() {
       });
 
       it('stop() should cancel ping timeout.', function() {
-
         Keepalive.start();
         Keepalive.stop();
 
@@ -150,7 +146,6 @@ describe('ngIdle', function() {
       });
 
       it('ping() should immediately broadcast Keepalive event', function() {
-
         Keepalive.ping();
 
         $interval.flush(DEFAULTKEEPALIVEINTERVAL);
