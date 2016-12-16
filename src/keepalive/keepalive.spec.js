@@ -47,6 +47,8 @@ describe('ngIdle', function() {
     };
 
     describe('KeepaliveProvider', function() {
+
+
       it('http() should update options with simple GET', function() {
         KeepaliveProvider.http('/path/to/keepalive');
 
@@ -104,6 +106,8 @@ describe('ngIdle', function() {
 
       beforeEach(function() {
         Keepalive = create();
+        spyOn($rootScope, '$broadcast');
+        $rootScope.$broadcast.reset();
       });
 
       afterEach(function() {
@@ -116,21 +120,18 @@ describe('ngIdle', function() {
         expect(create()._options().interval).toBe(100);
       });
       it('start() after a new LONGER timeout should NOT broadcast Keepalive when the default timeout expires', function() {
-        spyOn($rootScope, '$broadcast');
         Keepalive.setInterval(100 * 60);
         Keepalive.start();
         $interval.flush(DEFAULTKEEPALIVEINTERVAL);
         expect($rootScope.$broadcast).not.toHaveBeenCalledWith('Keepalive');
       });
       it('start() after a new LONGER timeout should broadcast Keepalive when the new LONGER expires', function() {
-        spyOn($rootScope, '$broadcast');
         Keepalive.setInterval(100);
         Keepalive.start();
         $interval.flush(100 * 1000);
         expect($rootScope.$broadcast).toHaveBeenCalledWith('Keepalive');
       });
       it('start() should schedule ping timeout that broadcasts Keepalive event when it expires.', function() {
-        spyOn($rootScope, '$broadcast');
 
         Keepalive.start();
 
@@ -140,7 +141,6 @@ describe('ngIdle', function() {
       });
 
       it('stop() should cancel ping timeout.', function() {
-        spyOn($rootScope, '$broadcast');
 
         Keepalive.start();
         Keepalive.stop();
@@ -151,7 +151,6 @@ describe('ngIdle', function() {
       });
 
       it('ping() should immediately broadcast Keepalive event', function() {
-        spyOn($rootScope, '$broadcast');
 
         Keepalive.ping();
 
@@ -161,8 +160,6 @@ describe('ngIdle', function() {
       });
 
       it('should invoke a URL when pinged and broadcast KeepaliveResponse on success.', function() {
-        spyOn($rootScope, '$broadcast');
-
         Keepalive = create('/path/to/keepalive');
 
         Keepalive.start();
@@ -178,8 +175,6 @@ describe('ngIdle', function() {
       });
 
       it('should invoke a URL when pinged and broadcast KeepaliveResponse on error.', function() {
-        spyOn($rootScope, '$broadcast');
-
         Keepalive = create('/path/to/keepalive');
 
         Keepalive.start();

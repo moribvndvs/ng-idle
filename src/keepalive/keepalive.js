@@ -33,8 +33,8 @@ angular.module('ngIdle.keepalive', [])
           ping: null
         };
 
-        function handleResponse(data, status) {
-          $rootScope.$broadcast('KeepaliveResponse', data, status);
+        function handleResponse(response) {
+          $rootScope.$broadcast('KeepaliveResponse', response.data, response.status);
         }
 
         function ping() {
@@ -42,8 +42,8 @@ angular.module('ngIdle.keepalive', [])
 
           if (angular.isObject(options.http)) {
             $http(options.http)
-              .success(handleResponse)
-              .error(handleResponse);
+              .then(handleResponse)
+              .catch(handleResponse);
           }
         }
 
