@@ -247,8 +247,17 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
           };
 
           for(var i=0; i<eventList.length; i++) {
-            if ($window.addEventListener) $window.addEventListener(eventList[i], fn, false);
-            else $window.attachEvent(eventList[i], fn)
+            if ($window.addEventListener) {
+              $window.addEventListener(eventList[i], fn, false);
+              $rootScope.$on('$destroy', function () {
+                $window.removeEventListener(eventList[i], fn, false);
+              });
+            } else {
+              $window.attachEvent(eventList[i], fn);
+              $rootScope.$on('$destroy', function () {
+                $window.detachEvent (eventList[i], fn);
+              });
+            }
           }
         }
 
@@ -260,8 +269,17 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
           }
         };
 
-        if ($window.addEventListener) $window.addEventListener('storage', wrap, false);
-        else if ($window.attachEvent) $window.attachEvent('onstorage', wrap);
+        if ($window.addEventListener) {
+          $window.addEventListener('storage', wrap, false);
+          $rootScope.$on('$destroy', function () {
+            $window.removeEventListener('storage', wrap, false);
+          });
+        } else if ($window.attachEvent){
+          $window.attachEvent('onstorage', wrap);
+          $rootScope.$on('$destroy', function () {
+            $window.removeEventListener('onstorage', wrap);
+          });
+        }
 
         return svc;
       }
