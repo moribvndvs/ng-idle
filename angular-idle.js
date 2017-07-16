@@ -335,7 +335,7 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
             } else {
               $window.attachEvent(eventList[i], fn);
               $rootScope.$on('$destroy', function () {
-                $window.detachEvent (eventList[i], fn);
+                $window.detachEvent(eventList[i], fn);
               });
             }
           }
@@ -357,7 +357,7 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
         } else if ($window.attachEvent){
           $window.attachEvent('onstorage', wrap);
           $rootScope.$on('$destroy', function () {
-            $window.removeEventListener('onstorage', wrap);
+            $window.detachEvent('onstorage', wrap);
           });
         }
 
