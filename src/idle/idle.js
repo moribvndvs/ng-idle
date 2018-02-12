@@ -6,7 +6,8 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
       autoResume: 'idle', // lets events automatically resume (unsets idle state/resets warning)
       interrupt: 'mousemove keydown DOMMouseScroll mousewheel mousedown touchstart touchmove scroll',
       windowInterrupt: null,
-      keepalive: true
+      keepalive: true,
+      localStorageKey: 'expiry'
     };
 
     /**
@@ -41,6 +42,14 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
 
     this.keepalive = function(enabled) {
       options.keepalive = enabled === true;
+    };
+
+    this.setLocalStorageKey = function(key) {
+      options.localStorageKey = key;
+    };
+
+    this.getLocalStorageKey = function() {
+      return options.localStorageKey;
     };
 
     this.$get = ['$interval', '$log', '$rootScope', '$document', 'Keepalive', 'IdleLocalStorage', '$window',
@@ -133,14 +142,14 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
         }
 
         function getExpiry() {
-          var obj = LocalStorage.get('expiry');
+          var obj = LocalStorage.get(options.localStorageKey);
 
           return obj && obj.time ? new Date(obj.time) : null;
         }
 
         function setExpiry(date) {
-          if (!date) LocalStorage.remove('expiry');
-          else LocalStorage.set('expiry', {id: id, time: date});
+          if (!date) LocalStorage.remove(options.localStorageKey);
+          else LocalStorage.set(options.localStorageKey, {id: id, time: date});
         }
 
         var svc = {
@@ -150,6 +159,8 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
           _getNow: function() {
             return new Date();
           },
+          setLocalStorageKey: this.setLocalStorageKey,
+          getLocalStorageKey: this.getLocalStorageKey,
           getIdle: function(){
             return options.idle;
           },
@@ -262,7 +273,7 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
         }
 
         var wrap = function(event) {
-          if (event.key === 'ngIdle.expiry' && event.newValue && event.newValue !== event.oldValue) {
+          if (event.key === 'ngIdle.' + svc.getLocalStorageKey() && event.newValue && event.newValue !== event.oldValue) {
             var val = angular.fromJson(event.newValue);
             if (val.id === id) return;
             svc.interrupt(true);
