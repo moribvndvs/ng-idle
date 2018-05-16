@@ -130,7 +130,8 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
           timeout: null,
           idling: false,
           running: false,
-          countdown: null
+          countdown: null,
+          idleIntervalStarted: null
         };
 
         var id = new Date().getTime();
@@ -249,6 +250,17 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
           running: function() {
             return state.running;
           },
+          getTimeUntilIdle: function() {
+            if (state.idleIntervalStarted) {
+              var endTime = state.idleIntervalStarted.getTime() + (options.idle * 1000);
+              return endTime - (new Date()).getTime();
+            } else {
+              return null;
+            }
+          },
+          lastActivity: function() {
+            return state.idleIntervalStarted;
+          },
           idling: function() {
             return state.idling;
           },
@@ -266,6 +278,7 @@ angular.module('ngIdle.idle', ['ngIdle.keepalive', 'ngIdle.localStorage'])
 
             state.running = true;
 
+            state.idleIntervalStarted = new Date();
             state.idle = $interval(toggleState, options.idle * 1000, 0, false);
           },
           unwatch: function() {
